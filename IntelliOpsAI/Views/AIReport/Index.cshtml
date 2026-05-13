@@ -4,23 +4,22 @@
 
 <div class="container mt-4">
 
-    <h2>AI Reports Module</h2>
-
-    <p>
-        Generate intelligent productivity insights based on system work logs.
-    </p>
+    <h2>AI Reports Engine</h2>
+    <p class="text-muted">Generate AI-style workforce analysis reports</p>
 
     <a href="/AIReport/Generate" class="btn btn-dark mb-3">
-        Generate AI Report
+        Generate Report
     </a>
 
     @if (ViewBag.Report != null)
     {
-        <div class="card shadow p-3 mt-3">
+        <div class="card p-4 mt-3">
 
-            <h5>Generated Report</h5>
+            <h5>Generated AI Report</h5>
 
-            <pre style="white-space: pre-wrap;">@ViewBag.Report</pre>
+            <pre style="white-space: pre-wrap; font-size: 14px;">
+                @ViewBag.Report
+                </pre>
 
         </div>
     }
