@@ -1,0 +1,26 @@
+﻿@model List<IntelliOpsAI.Models.WorkLog>
+
+<h2>Work Logs</h2>
+
+<a href="/WorkLog/Create" class="btn btn-primary mb-3">Add Work Log</a>
+
+<table class="table table-bordered">
+    <tr>
+        <th>Employee</th>
+        <th>Task</th>
+        <th>Hours</th>
+        <th>Status</th>
+        <th>Date</th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.EmployeeName</td>
+            <td>@item.TaskName</td>
+            <td>@item.HoursWorked</td>
+            <td>@item.Status</td>
+            <td>@item.Date</td>
+        </tr>
+    }
+</table>

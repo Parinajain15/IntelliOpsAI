@@ -1,0 +1,29 @@
+﻿@model IntelliOpsAI.Models.WorkLog
+
+<h2>Add Work Log</h2>
+
+<form method="post">
+
+    <div class="mb-3">
+        <label>Employee Name</label>
+        <input type="text" name="EmployeeName" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Task Name</label>
+        <input type="text" name="TaskName" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Hours Worked</label>
+        <input type="number" name="HoursWorked" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Status</label>
+        <input type="text" name="Status" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+
+</form>
