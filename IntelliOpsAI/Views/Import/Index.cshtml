@@ -1,0 +1,51 @@
+﻿@{
+    ViewData["Title"] = "Import Data";
+}
+
+<div class="container">
+
+    <div class="card p-5">
+
+        <h2 class="mb-4">
+            Import Operational Dataset
+        </h2>
+
+        <p class="text-muted mb-4">
+            Upload workforce or operational CSV reports for automated analytics generation.
+        </p>
+
+        @if (ViewBag.Message != null)
+        {
+            <div class="alert alert-success">
+
+                @ViewBag.Message
+
+            </div>
+        }
+
+        <form asp-controller="Import"
+              asp-action="Upload"
+              method="post"
+              enctype="multipart/form-data">
+
+            <div class="mb-4">
+
+                <input type="file"
+                       name="file"
+                       class="form-control"
+                       required />
+
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary">
+
+                Upload CSV
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
