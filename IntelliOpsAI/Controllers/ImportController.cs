@@ -15,13 +15,13 @@ namespace IntelliOpsAI.Controllers
             _context = context;
         }
 
-        // LOAD IMPORT PAGE
+        // LOAD PAGE
         public IActionResult Index()
         {
             return View();
         }
 
-        // HANDLE CSV UPLOAD
+        // UPLOAD CSV
         [HttpPost]
         public IActionResult Upload(IFormFile file)
         {
@@ -30,6 +30,10 @@ namespace IntelliOpsAI.Controllers
                 ViewBag.Message = "Please select a CSV file.";
                 return View("Index");
             }
+
+            int totalRows = 0;
+            int successRows = 0;
+            int failedRows = 0;
 
             try
             {
@@ -45,26 +49,37 @@ namespace IntelliOpsAI.Controllers
 
                 var records = csv.GetRecords<dynamic>().ToList();
 
+                totalRows = records.Count;
+
                 foreach (var row in records)
                 {
-                    var log = new WorkLog
+                    try
                     {
-                        EmployeeName = row.EmployeeName,
-                        TaskName = row.TaskType,   // IMPORTANT: CSV mapping fix
-                        HoursWorked = int.Parse(row.HoursWorked),
-                        Status = row.Status
-                    };
+                        var log = new WorkLog
+                        {
+                            EmployeeName = row.EmployeeName,
+                            TaskName = row.TaskType,
+                            HoursWorked = int.Parse(row.HoursWorked),
+                            Status = row.Status
+                        };
 
-                    _context.WorkLogs.Add(log);
+                        _context.WorkLogs.Add(log);
+                        successRows++;
+                    }
+                    catch
+                    {
+                        failedRows++;
+                    }
                 }
 
                 _context.SaveChanges();
 
-                ViewBag.Message = "CSV imported successfully!";
+                ViewBag.Message =
+                    $"Import Completed → Total: {totalRows}, Success: {successRows}, Failed: {failedRows}";
             }
             catch (Exception ex)
             {
-                ViewBag.Message = "Error while importing CSV: " + ex.Message;
+                ViewBag.Message = "Import Failed: " + ex.Message;
             }
 
             return View("Index");

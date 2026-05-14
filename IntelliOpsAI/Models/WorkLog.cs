@@ -4,14 +4,16 @@
     {
         public int Id { get; set; }
 
-        public string EmployeeName { get; set; } = string.Empty;
+        public string EmployeeName { get; set; }
 
-        public string TaskName { get; set; } = string.Empty;
+        public string TaskName { get; set; }
 
         public int HoursWorked { get; set; }
 
-        public string Status { get; set; } = string.Empty;
+        public string Status { get; set; }
 
-        public DateTime Date { get; set; }
+        public string? System { get; set; }
+
+        public DateTime Date { get; set; } = DateTime.Now;
     }
 }

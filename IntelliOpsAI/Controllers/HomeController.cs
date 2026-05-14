@@ -14,47 +14,43 @@ namespace IntelliOpsAI.Controllers
 
         public IActionResult Index()
         {
-            var totalLogs = _context.WorkLogs.Count();
+            var logs = _context.WorkLogs.ToList();
 
-            var completedTasks = _context.WorkLogs
-                .Count(x => x.Status == "Completed");
+            var totalLogs = logs.Count;
 
-            var pendingTasks = _context.WorkLogs
-                .Count(x => x.Status == "Pending");
+            var completed = logs.Count(x => x.Status == "Completed");
+            var pending = logs.Count(x => x.Status == "Pending");
+            var inProgress = logs.Count(x => x.Status == "In Progress");
 
-            var inProgressTasks = _context.WorkLogs
-                .Count(x => x.Status == "In Progress");
+            var totalHours = logs.Sum(x => x.HoursWorked);
 
-            var totalHours = _context.WorkLogs.Any()
-                ? _context.WorkLogs.Sum(x => x.HoursWorked)
-                : 0;
+            // SYSTEM WISE BREAKDOWN (NEW)
+            var timeTracker = logs.Count(x => x.System == "rTimeTracker");
+            var transport = logs.Count(x => x.System == "DigiTransport");
+            var supplier = logs.Count(x => x.System == "rSupplierPortal");
 
             ViewBag.TotalLogs = totalLogs;
-            ViewBag.CompletedTasks = completedTasks;
-            ViewBag.PendingTasks = pendingTasks;
-            ViewBag.InProgressTasks = inProgressTasks;
+            ViewBag.CompletedTasks = completed;
+            ViewBag.PendingTasks = pending;
+            ViewBag.InProgressTasks = inProgress;
             ViewBag.TotalHours = totalHours;
 
-            // AI INSIGHT LOGIC
+            ViewBag.TimeTracker = timeTracker;
+            ViewBag.Transport = transport;
+            ViewBag.Supplier = supplier;
+
+            // SIMPLE INSIGHT ENGINE
             if (totalLogs == 0)
             {
-                ViewBag.AIInsight =
-                    "No operational data available yet. Add work logs to generate AI insights.";
+                ViewBag.AIInsight = "No data available. Import operational datasets to generate insights.";
             }
-            else if (pendingTasks > completedTasks)
+            else if (pending > completed)
             {
-                ViewBag.AIInsight =
-                    "AI Alert: Pending workload is increasing. Consider optimizing employee task allocation.";
-            }
-            else if (completedTasks > pendingTasks)
-            {
-                ViewBag.AIInsight =
-                    "AI Insight: Operational productivity is stable with strong task completion trends.";
+                ViewBag.AIInsight = "Workload imbalance detected: pending tasks exceed completed tasks.";
             }
             else
             {
-                ViewBag.AIInsight =
-                    "AI Observation: Team workload is balanced across operational activities.";
+                ViewBag.AIInsight = "Operational flow is stable across systems.";
             }
 
             return View();
