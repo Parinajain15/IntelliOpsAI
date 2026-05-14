@@ -6,6 +6,7 @@
 
         <div>
             <h2>Work Logs</h2>
+
             <p class="text-muted">
                 Monitor employee productivity and operational tasks
             </p>
@@ -35,8 +36,11 @@
 
                 <div class="col-md-2">
 
-                    <button type="submit" class="btn btn-dark w-100">
+                    <button type="submit"
+                            class="btn btn-dark w-100">
+
                         Search
+
                     </button>
 
                 </div>
@@ -55,11 +59,14 @@
             <thead class="table-dark">
 
                 <tr>
+
                     <th>Employee</th>
                     <th>Task</th>
                     <th>Hours</th>
                     <th>Status</th>
                     <th>Date</th>
+                    <th>Actions</th>
+
                 </tr>
 
             </thead>
@@ -71,9 +78,13 @@
                     foreach (var item in Model)
                     {
                         <tr>
+
                             <td>@item.EmployeeName</td>
+
                             <td>@item.TaskName</td>
+
                             <td>@item.HoursWorked</td>
+
                             <td>
 
                                 @if (item.Status == "Completed")
@@ -96,16 +107,37 @@
                                 }
 
                             </td>
+
                             <td>@item.Date</td>
+
+                            <td>
+
+                                <a href="/WorkLog/Edit/@item.Id"
+                                   class="btn btn-sm btn-primary">
+                                    Edit
+                                </a>
+
+                                <a href="/WorkLog/Delete/@item.Id"
+                                   class="btn btn-sm btn-danger">
+                                    Delete
+                                </a>
+
+                            </td>
+
                         </tr>
                     }
                 }
                 else
                 {
                     <tr>
-                        <td colspan="5" class="text-center text-muted">
+
+                        <td colspan="6"
+                            class="text-center text-muted">
+
                             No matching work logs found
+
                         </td>
+
                     </tr>
                 }
 

@@ -1,0 +1,66 @@
+﻿@model IntelliOpsAI.Models.WorkLog
+
+<div class="container-fluid">
+
+    <div class="card p-4">
+
+        <h2 class="mb-4">Edit Work Log</h2>
+
+        <form method="post">
+
+            <input asp-for="Id" hidden />
+
+            <div class="mb-3">
+
+                <label>Employee Name</label>
+
+                <input asp-for="EmployeeName"
+                       class="form-control" />
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>Task Name</label>
+
+                <input asp-for="TaskName"
+                       class="form-control" />
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>Hours Worked</label>
+
+                <input asp-for="HoursWorked"
+                       type="number"
+                       class="form-control" />
+
+            </div>
+
+            <div class="mb-3">
+
+                <label>Status</label>
+
+                <select asp-for="Status" class="form-select">
+
+                    <option>Completed</option>
+                    <option>Pending</option>
+                    <option>In Progress</option>
+
+                </select>
+
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary">
+
+                Update Work Log
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
