@@ -1,20 +1,59 @@
 ﻿@model List<IntelliOpsAI.Models.WorkLog>
 
-<div class="container">
+<div class="container-fluid">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Work Logs</h2>
+
+        <div>
+            <h2>Work Logs</h2>
+            <p class="text-muted">
+                Monitor employee productivity and operational tasks
+            </p>
+        </div>
 
         <a href="/WorkLog/Create" class="btn btn-primary">
             + Add Work Log
         </a>
+
     </div>
 
+    <!-- SEARCH BAR -->
+    <div class="card p-3 mb-4">
+
+        <form method="get">
+
+            <div class="row">
+
+                <div class="col-md-10">
+
+                    <input type="text"
+                           name="searchTerm"
+                           class="form-control"
+                           placeholder="Search by employee or task..." />
+
+                </div>
+
+                <div class="col-md-2">
+
+                    <button type="submit" class="btn btn-dark w-100">
+                        Search
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- TABLE -->
     <div class="card p-3">
 
-        <table class="table table-striped table-hover align-middle">
+        <table class="table table-hover align-middle">
 
             <thead class="table-dark">
+
                 <tr>
                     <th>Employee</th>
                     <th>Task</th>
@@ -22,9 +61,11 @@
                     <th>Status</th>
                     <th>Date</th>
                 </tr>
+
             </thead>
 
             <tbody>
+
                 @if (Model != null && Model.Count > 0)
                 {
                     foreach (var item in Model)
@@ -42,10 +83,11 @@
                 {
                     <tr>
                         <td colspan="5" class="text-center text-muted">
-                            No work logs available yet
+                            No matching work logs found
                         </td>
                     </tr>
                 }
+
             </tbody>
 
         </table>

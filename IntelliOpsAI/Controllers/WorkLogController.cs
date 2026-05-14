@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using IntelliOpsAI.Models;
-using System.Collections.Generic;
 
 namespace IntelliOpsAI.Controllers
 {
@@ -8,9 +7,20 @@ namespace IntelliOpsAI.Controllers
     {
         private static List<WorkLog> logs = new List<WorkLog>();
 
-        public IActionResult Index()
+        public IActionResult Index(string searchTerm)
         {
-            return View(logs);
+            var filteredLogs = logs;
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                filteredLogs = logs
+                    .Where(x =>
+                        x.EmployeeName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                        || x.TaskName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            return View(filteredLogs);
         }
 
         public IActionResult Create()
