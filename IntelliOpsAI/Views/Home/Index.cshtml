@@ -4,35 +4,67 @@
 
 <div class="container-fluid">
 
-    <div class="mb-4">
-        <h2>IntelliOps AI Dashboard</h2>
-        <p class="text-muted">
-            Enterprise workforce intelligence and analytics system
-        </p>
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>IntelliOps AI Dashboard</h2>
+            <p class="text-muted">
+                Enterprise workforce intelligence and analytics system
+            </p>
+        </div>
+
+        <a href="/WorkLog/Create" class="btn btn-primary">
+            + Add Work Log
+        </a>
+
     </div>
 
     <!-- KPI CARDS -->
     <div class="row mb-4">
 
-        <div class="col-md-4">
-            <div class="card p-4 text-center">
-                <h5>Total Employees</h5>
+        <div class="col-md-3">
+
+            <div class="card p-4 text-white bg-primary">
+
+                <h6>Total Employees</h6>
                 <h2>24</h2>
+
             </div>
+
         </div>
 
-        <div class="col-md-4">
-            <div class="card p-4 text-center">
-                <h5>Active Tasks</h5>
+        <div class="col-md-3">
+
+            <div class="card p-4 text-white bg-success">
+
+                <h6>Completed Tasks</h6>
                 <h2>58</h2>
+
             </div>
+
         </div>
 
-        <div class="col-md-4">
-            <div class="card p-4 text-center">
-                <h5>Pending Reviews</h5>
+        <div class="col-md-3">
+
+            <div class="card p-4 text-white bg-warning">
+
+                <h6>Pending Reviews</h6>
                 <h2>12</h2>
+
             </div>
+
+        </div>
+
+        <div class="col-md-3">
+
+            <div class="card p-4 text-white bg-danger">
+
+                <h6>Alerts</h6>
+                <h2>4</h2>
+
+            </div>
+
         </div>
 
     </div>
@@ -40,7 +72,7 @@
     <!-- CHARTS -->
     <div class="row">
 
-        <div class="col-md-6 mb-4">
+        <div class="col-md-8 mb-4">
 
             <div class="card p-4">
 
@@ -52,7 +84,7 @@
 
         </div>
 
-        <div class="col-md-6 mb-4">
+        <div class="col-md-4 mb-4">
 
             <div class="card p-4">
 
@@ -66,15 +98,55 @@
 
     </div>
 
-    <!-- AI INSIGHT -->
-    <div class="card p-4">
+    <!-- LOWER SECTION -->
+    <div class="row">
 
-        <h5>AI Insight Engine</h5>
+        <!-- RECENT ACTIVITY -->
+        <div class="col-md-6 mb-4">
 
-        <p class="text-muted">
-            AI analysis detected stable operational efficiency with improved task completion trends.
-            Recommendation: optimize workload balancing to increase throughput.
-        </p>
+            <div class="card p-4">
+
+                <h5 class="mb-3">Recent Activity</h5>
+
+                <ul class="list-group">
+
+                    <li class="list-group-item">
+                        Rahul completed Inventory Module
+                    </li>
+
+                    <li class="list-group-item">
+                        Priya submitted AI Report
+                    </li>
+
+                    <li class="list-group-item">
+                        Sneha updated supplier workflow
+                    </li>
+
+                    <li class="list-group-item">
+                        Karan resolved pending review
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+        <!-- AI INSIGHT -->
+        <div class="col-md-6 mb-4">
+
+            <div class="card p-4">
+
+                <h5 class="mb-3">AI Insight Engine</h5>
+
+                <p class="text-muted">
+                    AI analysis detected stable operational efficiency with improved task completion trends.
+                    Recommendation: optimize workload balancing to increase throughput and reduce pending reviews.
+                </p>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -84,7 +156,8 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // PRODUCTIVITY BAR CHART
+
+    // BAR CHART
     const productivityCtx = document.getElementById('productivityChart');
 
     new Chart(productivityCtx, {
@@ -102,7 +175,7 @@
         }
     });
 
-    // TASK DISTRIBUTION PIE CHART
+    // PIE CHART
     const taskCtx = document.getElementById('taskChart');
 
     new Chart(taskCtx, {
@@ -117,4 +190,5 @@
             responsive: true
         }
     });
+
 </script>
