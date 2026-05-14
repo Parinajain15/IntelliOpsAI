@@ -15,30 +15,56 @@ namespace IntelliOpsAI.Controllers
             _context = context;
         }
 
+        // LOAD IMPORT PAGE
         public IActionResult Index()
         {
             return View();
         }
 
+        // HANDLE CSV UPLOAD
         [HttpPost]
         public IActionResult Upload(IFormFile file)
         {
-            if (file != null && file.Length > 0)
+            if (file == null || file.Length == 0)
             {
-                using (var reader = new StreamReader(file.OpenReadStream()))
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                ViewBag.Message = "Please select a CSV file.";
+                return View("Index");
+            }
+
+            try
+            {
+                using var reader = new StreamReader(file.OpenReadStream());
+
+                var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
                 {
-                    var records = csv.GetRecords<WorkLog>().ToList();
+                    HeaderValidated = null,
+                    MissingFieldFound = null
+                };
 
-                    foreach (var record in records)
+                using var csv = new CsvReader(reader, config);
+
+                var records = csv.GetRecords<dynamic>().ToList();
+
+                foreach (var row in records)
+                {
+                    var log = new WorkLog
                     {
-                        _context.WorkLogs.Add(record);
-                    }
+                        EmployeeName = row.EmployeeName,
+                        TaskName = row.TaskType,   // IMPORTANT: CSV mapping fix
+                        HoursWorked = int.Parse(row.HoursWorked),
+                        Status = row.Status
+                    };
 
-                    _context.SaveChanges();
+                    _context.WorkLogs.Add(log);
                 }
 
+                _context.SaveChanges();
+
                 ViewBag.Message = "CSV imported successfully!";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = "Error while importing CSV: " + ex.Message;
             }
 
             return View("Index");
