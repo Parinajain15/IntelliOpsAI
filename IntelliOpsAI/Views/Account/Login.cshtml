@@ -1,38 +1,133 @@
 ﻿@{
-    ViewData["Title"] = "Login";
+    Layout = null;
 }
 
-<div class="container">
+<!DOCTYPE html>
+<html lang="en">
 
-    <div class="card login-card mt-5">
+<head>
 
-        <h3 class="text-center mb-3">IntelliOps AI Login</h3>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        @if (ViewBag.Error != null)
-        {
-            <div class="alert alert-danger">
-                @ViewBag.Error
-            </div>
+    <title>Login - IntelliOps AI</title>
+
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <style>
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to right, #0f172a, #1e293b);
+            font-family: 'Segoe UI', sans-serif;
         }
 
-        <form method="post" action="/Account/Login">
+        .login-card {
+            width: 400px;
+            background: white;
+            padding: 40px;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+
+        .login-title {
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .login-subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            background: #2563eb;
+            border: none;
+            font-weight: 600;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+            .brand h2 {
+                font-weight: 800;
+                color: #2563eb;
+            }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="login-card">
+
+        <div class="brand">
+
+            <h2>IntelliOps AI</h2>
+
+            <p class="text-muted">
+                Workforce Intelligence Platform
+            </p>
+
+        </div>
+
+        <h3 class="login-title">
+            Welcome Back
+        </h3>
+
+        <p class="login-subtitle">
+            Sign in to continue
+        </p>
+
+        <form method="post">
 
             <div class="mb-3">
-                <label>Email</label>
-                <input type="email" name="email" class="form-control" />
+
+                <input type="email"
+                       name="email"
+                       class="form-control"
+                       placeholder="Enter email"
+                       required />
+
             </div>
 
-            <div class="mb-3">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control" />
+            <div class="mb-4">
+
+                <input type="password"
+                       name="password"
+                       class="form-control"
+                       placeholder="Enter password"
+                       required />
+
             </div>
 
-            <button type="submit" class="btn btn-dark w-100">
+            <button type="submit"
+                    class="btn btn-primary btn-login">
+
                 Login
+
             </button>
 
         </form>
 
     </div>
 
-</div>
+</body>
+
+</html>

@@ -1,12 +1,26 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>IntelliOps AI</title>
 
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Site CSS -->
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
 </head>
 
 <body>
@@ -14,27 +28,81 @@
     <div class="d-flex">
 
         <!-- SIDEBAR -->
-        <div class="sidebar bg-dark text-white p-3">
+        <div class="sidebar">
 
-            <h4 class="mb-4">IntelliOps AI</h4>
+            <div>
 
-            <a href="/Home/Index" class="sidebar-link">Dashboard</a>
-            <a href="/WorkLog" class="sidebar-link">Work Logs</a>
-            <a href="/AIReport" class="sidebar-link">AI Reports</a>
-            <a href="/Account/Login" class="sidebar-link text-warning">Logout</a>
+                <h2 style="color:white; font-weight:800;">
+                    IntelliOps AI
+                </h2>
+
+                <p style="color:#e2e8f0; margin-bottom:30px;">
+                    Workforce Intelligence
+                </p>
+
+                <!-- DASHBOARD -->
+                <a href="/Home/Index"
+                   class="sidebar-link">
+
+                    <i class="bi bi-grid-fill"></i>
+
+                    Dashboard
+
+                </a>
+
+                <!-- WORK LOGS -->
+                <a href="/WorkLog/Index"
+                   class="sidebar-link">
+
+                    <i class="bi bi-clipboard-data-fill"></i>
+
+                    Work Logs
+
+                </a>
+
+                <!-- AI REPORTS -->
+                <a href="/AIReport/Index"
+                   class="sidebar-link">
+
+                    <i class="bi bi-robot"></i>
+
+                    AI Reports
+
+                </a>
+
+            </div>
+
+            <!-- LOGOUT -->
+            <div>
+
+                <a href="/Account/Login"
+                   class="sidebar-link logout-link">
+
+                    <i class="bi bi-box-arrow-right"></i>
+
+                    Logout
+
+                </a>
+
+            </div>
 
         </div>
 
         <!-- MAIN CONTENT -->
-        <div class="content flex-grow-1">
+        <div class="content">
 
-            <div class="container mt-4">
+            <div class="container-fluid mt-4">
+
                 @RenderBody()
+
             </div>
 
         </div>
 
     </div>
 
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+
 </html>

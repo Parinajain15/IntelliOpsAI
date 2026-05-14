@@ -1,27 +1,33 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using IntelliOpsAI.Data;
 using IntelliOpsAI.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace IntelliOpsAI.Controllers
 {
     public class WorkLogController : Controller
     {
-        private static List<WorkLog> logs = new List<WorkLog>();
+        private readonly ApplicationDbContext _context;
+
+        public WorkLogController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
         // VIEW LOGS
-        public IActionResult Index(string searchTerm)
+        public async Task<IActionResult> Index(string searchTerm)
         {
-            var filteredLogs = logs;
+            var logs = from l in _context.WorkLogs
+                       select l;
 
             if (!string.IsNullOrEmpty(searchTerm))
             {
-                filteredLogs = logs
-                    .Where(x =>
-                        x.EmployeeName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                        || x.TaskName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
+                logs = logs.Where(x =>
+                    x.EmployeeName.Contains(searchTerm) ||
+                    x.TaskName.Contains(searchTerm));
             }
 
-            return View(filteredLogs);
+            return View(await logs.ToListAsync());
         }
 
         // CREATE GET
@@ -32,49 +38,46 @@ namespace IntelliOpsAI.Controllers
 
         // CREATE POST
         [HttpPost]
-        public IActionResult Create(WorkLog log)
+        public async Task<IActionResult> Create(WorkLog log)
         {
-            log.Id = logs.Count + 1;
             log.Date = DateTime.Now;
 
-            logs.Add(log);
+            _context.WorkLogs.Add(log);
+
+            await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
         }
 
         // EDIT GET
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var log = logs.FirstOrDefault(x => x.Id == id);
+            var log = await _context.WorkLogs.FindAsync(id);
 
             return View(log);
         }
 
         // EDIT POST
         [HttpPost]
-        public IActionResult Edit(WorkLog updatedLog)
+        public async Task<IActionResult> Edit(WorkLog updatedLog)
         {
-            var existingLog = logs.FirstOrDefault(x => x.Id == updatedLog.Id);
+            _context.WorkLogs.Update(updatedLog);
 
-            if (existingLog != null)
-            {
-                existingLog.EmployeeName = updatedLog.EmployeeName;
-                existingLog.TaskName = updatedLog.TaskName;
-                existingLog.HoursWorked = updatedLog.HoursWorked;
-                existingLog.Status = updatedLog.Status;
-            }
+            await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
         }
 
         // DELETE
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var log = logs.FirstOrDefault(x => x.Id == id);
+            var log = await _context.WorkLogs.FindAsync(id);
 
             if (log != null)
             {
-                logs.Remove(log);
+                _context.WorkLogs.Remove(log);
+
+                await _context.SaveChangesAsync();
             }
 
             return RedirectToAction("Index");
