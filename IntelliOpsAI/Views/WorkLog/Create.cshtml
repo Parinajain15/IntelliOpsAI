@@ -1,29 +1,72 @@
 ﻿@model IntelliOpsAI.Models.WorkLog
 
-<h2>Add Work Log</h2>
+<div class="container-fluid">
 
-<form method="post">
+    <div class="card p-4">
 
-    <div class="mb-3">
-        <label>Employee Name</label>
-        <input type="text" name="EmployeeName" class="form-control" />
+        <h2 class="mb-4">Add Work Log</h2>
+
+        <form method="post">
+
+            <div class="mb-3">
+
+                <label class="form-label">Employee Name</label>
+
+                <input asp-for="EmployeeName"
+                       class="form-control"
+                       required />
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">Task Name</label>
+
+                <input asp-for="TaskName"
+                       class="form-control"
+                       required />
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">Hours Worked</label>
+
+                <input asp-for="HoursWorked"
+                       type="number"
+                       class="form-control"
+                       required />
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">Status</label>
+
+                <select asp-for="Status" class="form-select">
+
+                    <option value="Completed">
+                        Completed
+                    </option>
+
+                    <option value="Pending">
+                        Pending
+                    </option>
+
+                    <option value="In Progress">
+                        In Progress
+                    </option>
+
+                </select>
+
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Save Work Log
+            </button>
+
+        </form>
+
     </div>
 
-    <div class="mb-3">
-        <label>Task Name</label>
-        <input type="text" name="TaskName" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label>Hours Worked</label>
-        <input type="number" name="HoursWorked" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label>Status</label>
-        <input type="text" name="Status" class="form-control" />
-    </div>
-
-    <button type="submit" class="btn btn-success">Save</button>
-
-</form>
+</div>

@@ -74,7 +74,28 @@
                             <td>@item.EmployeeName</td>
                             <td>@item.TaskName</td>
                             <td>@item.HoursWorked</td>
-                            <td>@item.Status</td>
+                            <td>
+
+                                @if (item.Status == "Completed")
+                                {
+                                    <span class="badge bg-success">
+                                        Completed
+                                    </span>
+                                }
+                                else if (item.Status == "Pending")
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        Pending
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-primary">
+                                        In Progress
+                                    </span>
+                                }
+
+                            </td>
                             <td>@item.Date</td>
                         </tr>
                     }
