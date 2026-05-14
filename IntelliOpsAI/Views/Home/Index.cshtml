@@ -2,31 +2,34 @@
     ViewData["Title"] = "Dashboard";
 }
 
-<div class="container">
+<div class="container-fluid">
 
     <div class="mb-4">
         <h2>IntelliOps AI Dashboard</h2>
-        <p class="text-muted">Operational intelligence & workforce analytics</p>
+        <p class="text-muted">
+            Enterprise workforce intelligence and analytics system
+        </p>
     </div>
 
-    <div class="row">
+    <!-- KPI CARDS -->
+    <div class="row mb-4">
 
         <div class="col-md-4">
-            <div class="card text-center p-4">
+            <div class="card p-4 text-center">
                 <h5>Total Employees</h5>
                 <h2>24</h2>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="card text-center p-4">
+            <div class="card p-4 text-center">
                 <h5>Active Tasks</h5>
                 <h2>58</h2>
             </div>
         </div>
 
         <div class="col-md-4">
-            <div class="card text-center p-4">
+            <div class="card p-4 text-center">
                 <h5>Pending Reviews</h5>
                 <h2>12</h2>
             </div>
@@ -34,15 +37,84 @@
 
     </div>
 
-    <div class="card mt-4 p-4">
+    <!-- CHARTS -->
+    <div class="row">
+
+        <div class="col-md-6 mb-4">
+
+            <div class="card p-4">
+
+                <h5 class="mb-3">Employee Productivity</h5>
+
+                <canvas id="productivityChart"></canvas>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-6 mb-4">
+
+            <div class="card p-4">
+
+                <h5 class="mb-3">Task Distribution</h5>
+
+                <canvas id="taskChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- AI INSIGHT -->
+    <div class="card p-4">
 
         <h5>AI Insight Engine</h5>
 
         <p class="text-muted">
-            System analysis indicates stable productivity patterns with peak efficiency during morning hours.
-            Recommended action: optimize workload distribution across teams for improved throughput.
+            AI analysis detected stable operational efficiency with improved task completion trends.
+            Recommendation: optimize workload balancing to increase throughput.
         </p>
 
     </div>
 
 </div>
+
+<!-- CHART JS CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // PRODUCTIVITY BAR CHART
+    const productivityCtx = document.getElementById('productivityChart');
+
+    new Chart(productivityCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Rahul', 'Aman', 'Priya', 'Sneha', 'Karan'],
+            datasets: [{
+                label: 'Hours Worked',
+                data: [7, 8, 6, 9, 5],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+
+    // TASK DISTRIBUTION PIE CHART
+    const taskCtx = document.getElementById('taskChart');
+
+    new Chart(taskCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Completed', 'Pending', 'In Progress'],
+            datasets: [{
+                data: [18, 7, 12]
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>
