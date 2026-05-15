@@ -1,188 +1,116 @@
-﻿@{
+﻿@model IntelliOpsAI.Models.DashboardViewModel
+
+@{
     ViewData["Title"] = "Dashboard";
 }
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="container-fluid p-4">
 
-<div class="container-fluid">
-
-    <!-- HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <div>
-
-            <h2>IntelliOps AI Dashboard</h2>
-
-            <p class="text-muted">
-                Real-time workforce analytics and operational intelligence
-            </p>
-
-        </div>
-
-        <a href="/WorkLog/Create"
-           class="btn btn-primary">
-
-            + Add Work Log
-
-        </a>
-
+    <div class="mb-4">
+        <h2 style="font-weight:700;">Enterprise Analytics Dashboard</h2>
+        <p style="color:gray;">
+            AI-powered workforce intelligence and system analytics
+        </p>
     </div>
 
     <!-- KPI CARDS -->
+
     <div class="row mb-4">
 
         <div class="col-md-3">
-
-            <div class="card p-4 text-white bg-primary">
-
+            <div class="card shadow-sm border-0 p-3">
                 <h6>Total Logs</h6>
-
-                <h2>@ViewBag.TotalLogs</h2>
-
+                <h2>@Model.TotalLogs</h2>
             </div>
-
         </div>
 
         <div class="col-md-3">
-
-            <div class="card p-4 text-white bg-success">
-
-                <h6>Completed Tasks</h6>
-
-                <h2>@ViewBag.CompletedTasks</h2>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="card p-4 text-white bg-warning">
-
-                <h6>Pending Tasks</h6>
-
-                <h2>@ViewBag.PendingTasks</h2>
-
-            </div>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <div class="card p-4 text-white bg-dark">
-
+            <div class="card shadow-sm border-0 p-3">
                 <h6>Total Hours</h6>
-
-                <h2>@ViewBag.TotalHours</h2>
-
+                <h2>@Model.TotalHours</h2>
             </div>
-
         </div>
 
-    </div>
-
-    <!-- CHARTS -->
-    <div class="row mb-4">
-
-        <!-- PIE CHART -->
-        <div class="col-md-6">
-
-            <div class="card p-4">
-
-                <h5 class="mb-3">
-                    Task Distribution
-                </h5>
-
-                <div style="max-width:350px; margin:auto;">
-
-                    <canvas id="taskChart"></canvas>
-
-                </div>
-
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 p-3">
+                <h6>Completed Tasks</h6>
+                <h2>@Model.Completed</h2>
             </div>
-
         </div>
 
-        <!-- BAR CHART -->
-        <div class="col-md-6">
-
-            <div class="card p-4">
-
-                <h5 class="mb-3">
-                    Productivity Overview
-                </h5>
-
-                <canvas id="hoursChart"></canvas>
-
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 p-3">
+                <h6>Pending Tasks</h6>
+                <h2>@Model.Pending</h2>
             </div>
-
         </div>
 
     </div>
 
     <!-- AI INSIGHT -->
-    <div class="card p-4">
 
-        <h4 class="mb-3">
-            AI Operational Insight
-        </h4>
+    <div class="alert alert-info shadow-sm">
+        <strong>AI Insight:</strong> @Model.AIInsight
+    </div>
 
-        <p class="text-muted">
+    <!-- CHART -->
 
-            @ViewBag.AIInsight
+    <div class="card shadow-sm border-0 p-4 mt-4">
 
-        </p>
+        <h5 class="mb-4">System Distribution</h5>
+
+        <div style="height:400px;">
+            <canvas id="systemChart"></canvas>
+        </div>
 
     </div>
 
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
 <script>
 
-    // TASK DISTRIBUTION CHART
-    new Chart(document.getElementById('taskChart'), {
+    window.onload = function () {
 
-        type: 'doughnut',
+        const labels = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(Model.SystemLabels)
+            );
 
-        data: {
+        const values = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(Model.SystemValues)
+            );
 
-            labels: ['Completed', 'Pending', 'In Progress'],
+        const ctx = document
+            .getElementById("systemChart")
+            .getContext("2d");
 
-            datasets: [{
-                data: [
-    @ViewBag.CompletedTasks,
-    @ViewBag.PendingTasks,
-    @ViewBag.InProgressTasks
-                    ]
-            }]
-        },
+        new Chart(ctx, {
+            type: 'doughnut',
 
-        options: {
-            responsive: true,
-            maintainAspectRatio: true
-        }
+            data: {
+                labels: labels,
 
-    });
+                datasets: [{
+                    label: 'System Usage',
+                    data: values,
 
-    // PRODUCTIVITY CHART
-    new Chart(document.getElementById('hoursChart'), {
+                    backgroundColor: [
+                        '#4e79a7',
+                        '#f28e2b',
+                        '#e15759'
+                    ],
 
-        type: 'bar',
+                    borderWidth: 1
+                }]
+            },
 
-        data: {
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
 
-            labels: ['Total Hours Worked'],
-
-            datasets: [{
-                label: 'Hours',
-                data: [@ViewBag.TotalHours]
-            }]
-        },
-
-        options: {
-            responsive: true
-        }
-
-    });
+    };
 
 </script>

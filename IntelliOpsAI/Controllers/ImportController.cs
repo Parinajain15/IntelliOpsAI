@@ -15,72 +15,47 @@ namespace IntelliOpsAI.Controllers
             _context = context;
         }
 
-        // LOAD PAGE
         public IActionResult Index()
         {
             return View();
         }
 
-        // UPLOAD CSV
         [HttpPost]
         public IActionResult Upload(IFormFile file)
         {
             if (file == null || file.Length == 0)
             {
-                ViewBag.Message = "Please select a CSV file.";
+                ViewBag.Message = "No file selected";
                 return View("Index");
             }
 
-            int totalRows = 0;
-            int successRows = 0;
-            int failedRows = 0;
-
-            try
+            using (var reader = new StreamReader(file.OpenReadStream()))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
-                using var reader = new StreamReader(file.OpenReadStream());
+                var records = csv.GetRecords<WorkLogCsv>().ToList();
 
-                var config = new CsvHelper.Configuration.CsvConfiguration(CultureInfo.InvariantCulture)
+                foreach (var record in records)
                 {
-                    HeaderValidated = null,
-                    MissingFieldFound = null
-                };
-
-                using var csv = new CsvReader(reader, config);
-
-                var records = csv.GetRecords<dynamic>().ToList();
-
-                totalRows = records.Count;
-
-                foreach (var row in records)
-                {
-                    try
+                    var workLog = new WorkLog
                     {
-                        var log = new WorkLog
-                        {
-                            EmployeeName = row.EmployeeName,
-                            TaskName = row.TaskType,
-                            HoursWorked = int.Parse(row.HoursWorked),
-                            Status = row.Status
-                        };
+                        EmployeeName = record.EmployeeName,
+                        TaskName = record.TaskType,
 
-                        _context.WorkLogs.Add(log);
-                        successRows++;
-                    }
-                    catch
-                    {
-                        failedRows++;
-                    }
+                        // 🔥 THIS WAS MISSING
+                        System = record.System,
+
+                        HoursWorked = record.HoursWorked,
+                        Status = record.Status,
+                        Date = record.Date
+                    };
+
+                    _context.WorkLogs.Add(workLog);
                 }
 
                 _context.SaveChanges();
+            }
 
-                ViewBag.Message =
-                    $"Import Completed → Total: {totalRows}, Success: {successRows}, Failed: {failedRows}";
-            }
-            catch (Exception ex)
-            {
-                ViewBag.Message = "Import Failed: " + ex.Message;
-            }
+            ViewBag.Message = "CSV Uploaded Successfully";
 
             return View("Index");
         }

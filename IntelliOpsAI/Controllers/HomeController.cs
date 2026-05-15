@@ -1,5 +1,7 @@
-using IntelliOpsAI.Data;
+﻿using IntelliOpsAI.Data;
+using IntelliOpsAI.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace IntelliOpsAI.Controllers
 {
@@ -16,44 +18,43 @@ namespace IntelliOpsAI.Controllers
         {
             var logs = _context.WorkLogs.ToList();
 
-            var totalLogs = logs.Count;
+            // RAW DATABASE VALUES
+            var rawSystems = logs
+                .Select(x => x.System)
+                .ToList();
 
-            var completed = logs.Count(x => x.Status == "Completed");
-            var pending = logs.Count(x => x.Status == "Pending");
-            var inProgress = logs.Count(x => x.Status == "In Progress");
+            ViewBag.RawSystems = rawSystems;
 
-            var totalHours = logs.Sum(x => x.HoursWorked);
+            // NORMALIZED VALUES
+            var normalized = logs
+                .Select(x => (x.System ?? "").Trim().ToLower())
+                .ToList();
 
-            // SYSTEM WISE BREAKDOWN (NEW)
-            var timeTracker = logs.Count(x => x.System == "rTimeTracker");
-            var transport = logs.Count(x => x.System == "DigiTransport");
-            var supplier = logs.Count(x => x.System == "rSupplierPortal");
-
-            ViewBag.TotalLogs = totalLogs;
-            ViewBag.CompletedTasks = completed;
-            ViewBag.PendingTasks = pending;
-            ViewBag.InProgressTasks = inProgress;
-            ViewBag.TotalHours = totalHours;
-
-            ViewBag.TimeTracker = timeTracker;
-            ViewBag.Transport = transport;
-            ViewBag.Supplier = supplier;
-
-            // SIMPLE INSIGHT ENGINE
-            if (totalLogs == 0)
+            var model = new DashboardViewModel
             {
-                ViewBag.AIInsight = "No data available. Import operational datasets to generate insights.";
-            }
-            else if (pending > completed)
-            {
-                ViewBag.AIInsight = "Workload imbalance detected: pending tasks exceed completed tasks.";
-            }
-            else
-            {
-                ViewBag.AIInsight = "Operational flow is stable across systems.";
-            }
+                TotalLogs = logs.Count,
+                TotalHours = logs.Sum(x => x.HoursWorked),
+                Completed = logs.Count(x => x.Status == "Completed"),
+                Pending = logs.Count(x => x.Status == "Pending"),
 
-            return View();
+                SystemLabels = new[]
+                {
+                    "rTimeTracker",
+                    "DigiTransport",
+                    "rSupplierPortal"
+                },
+
+                SystemValues = new[]
+                {
+                    normalized.Count(x => x == "rtimetracker"),
+                    normalized.Count(x => x == "digitransport"),
+                    normalized.Count(x => x == "rsupplierportal")
+                },
+
+                AIInsight = "Database Debug Active"
+            };
+
+            return View(model);
         }
     }
 }
