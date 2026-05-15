@@ -6,19 +6,36 @@
 
     @if (SignInManager.IsSignedIn(User))
     {
+        var currentUser = await UserManager.GetUserAsync(User);
+        var roles = await UserManager.GetRolesAsync(currentUser);
+
         <li class="nav-item">
-            <a class="nav-link text-dark">
-                Hello @User.Identity?.Name!
-            </a>
+            <span class="nav-link text-dark">
+                Hello @User.Identity?.Name
+            </span>
         </li>
+
+        @if (roles.Contains("Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-controller="Import" asp-action="Index">
+                    Import CSV
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-controller="Export" asp-action="ExportToExcel">
+                    Export Excel
+                </a>
+            </li>
+        }
 
         <li class="nav-item">
             <form asp-area="Identity"
                   asp-page="/Account/Logout"
                   method="post">
 
-                <button type="submit"
-                        class="nav-link btn btn-link text-dark">
+                <button class="btn btn-link nav-link text-dark">
                     Logout
                 </button>
 
