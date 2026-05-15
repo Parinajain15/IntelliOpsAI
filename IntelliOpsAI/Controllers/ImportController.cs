@@ -1,11 +1,13 @@
 ﻿using CsvHelper;
 using IntelliOpsAI.Data;
 using IntelliOpsAI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 
 namespace IntelliOpsAI.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ImportController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -25,14 +27,17 @@ namespace IntelliOpsAI.Controllers
         {
             if (file == null || file.Length == 0)
             {
-                ViewBag.Message = "No file selected";
+                ViewBag.Message = "Please upload a CSV file.";
+
                 return View("Index");
             }
 
-            using (var reader = new StreamReader(file.OpenReadStream()))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            using (var stream = new StreamReader(file.OpenReadStream()))
+            using (var csv = new CsvReader(stream, CultureInfo.InvariantCulture))
             {
-                var records = csv.GetRecords<WorkLogCsv>().ToList();
+                var records = csv
+                    .GetRecords<WorkLogCsv>()
+                    .ToList();
 
                 foreach (var record in records)
                 {
@@ -40,7 +45,6 @@ namespace IntelliOpsAI.Controllers
                     {
                         EmployeeName = record.EmployeeName,
 
-                        // NEW
                         Department = record.Department,
 
                         TaskName = record.TaskType,
@@ -60,7 +64,7 @@ namespace IntelliOpsAI.Controllers
                 _context.SaveChanges();
             }
 
-            ViewBag.Message = "CSV Uploaded Successfully";
+            ViewBag.Message = "CSV Imported Successfully.";
 
             return View("Index");
         }

@@ -1,9 +1,11 @@
 ﻿using ClosedXML.Excel;
 using IntelliOpsAI.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IntelliOpsAI.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ExportController : Controller
     {
         private readonly ApplicationDbContext _context;

@@ -1,9 +1,11 @@
 ﻿using IntelliOpsAI.Data;
 using IntelliOpsAI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IntelliOpsAI.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -42,9 +44,13 @@ namespace IntelliOpsAI.Controllers
 
             var logList = logs.ToList();
 
+            // SYSTEM DISTRIBUTION
+
             var normalizedSystems = logList
                 .Select(x => (x.System ?? "").Trim().ToLower())
                 .ToList();
+
+            // DEPARTMENTS
 
             var departments = _context.WorkLogs
                 .Select(x => x.Department)
@@ -93,7 +99,7 @@ namespace IntelliOpsAI.Controllers
                 .Take(5)
                 .ToList();
 
-            // TREND GRAPH DATA
+            // TREND GRAPH
 
             var trendData = logList
                 .GroupBy(x => x.Date.Date)
