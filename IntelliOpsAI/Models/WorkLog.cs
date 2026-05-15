@@ -1,4 +1,6 @@
-﻿namespace IntelliOpsAI.Models
+﻿using System;
+
+namespace IntelliOpsAI.Models
 {
     public class WorkLog
     {
@@ -6,14 +8,17 @@
 
         public string EmployeeName { get; set; }
 
+        // NEW
+        public string Department { get; set; }
+
         public string TaskName { get; set; }
+
+        public string System { get; set; }
 
         public int HoursWorked { get; set; }
 
         public string Status { get; set; }
 
-        public string? System { get; set; }
-
-        public DateTime Date { get; set; } = DateTime.Now;
+        public DateTime Date { get; set; }
     }
 }

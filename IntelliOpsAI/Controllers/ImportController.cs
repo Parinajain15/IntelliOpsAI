@@ -39,13 +39,18 @@ namespace IntelliOpsAI.Controllers
                     var workLog = new WorkLog
                     {
                         EmployeeName = record.EmployeeName,
+
+                        // NEW
+                        Department = record.Department,
+
                         TaskName = record.TaskType,
 
-                        // 🔥 THIS WAS MISSING
                         System = record.System,
 
                         HoursWorked = record.HoursWorked,
+
                         Status = record.Status,
+
                         Date = record.Date
                     };
 

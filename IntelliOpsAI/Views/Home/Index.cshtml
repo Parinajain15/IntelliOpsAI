@@ -6,11 +6,118 @@
 
 <div class="container-fluid p-4">
 
-    <div class="mb-4">
-        <h2 style="font-weight:700;">Enterprise Analytics Dashboard</h2>
-        <p style="color:gray;">
-            AI-powered workforce intelligence and system analytics
-        </p>
+    <!-- HEADER -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h2 style="font-weight:700;">
+                Enterprise Analytics Dashboard
+            </h2>
+
+            <p style="color:gray;">
+                AI-powered workforce intelligence and analytics
+            </p>
+
+        </div>
+
+        <div>
+
+            <a asp-controller="Export"
+               asp-action="ExportToExcel"
+               class="btn btn-success">
+
+                Export Workforce Report
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- FILTERS -->
+
+    <div class="card shadow-sm border-0 p-4 mb-4">
+
+        <form method="get">
+
+            <div class="row">
+
+                <div class="col-md-3">
+
+                    <label class="mb-2">
+                        Department
+                    </label>
+
+                    <select name="selectedDepartment"
+                            class="form-control">
+
+                        <option value="">
+                            All
+                        </option>
+
+                        @foreach (var dept in Model.Departments)
+                        {
+                            if (dept == Model.SelectedDepartment)
+                            {
+                                <option value="@dept" selected>
+                                    @dept
+                                </option>
+                            }
+                            else
+                            {
+                                <option value="@dept">
+                                    @dept
+                                </option>
+                            }
+                        }
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label class="mb-2">
+                        Start Date
+                    </label>
+
+                    <input type="date"
+                           name="startDate"
+                           class="form-control"
+                           value="@(Model.StartDate?.ToString("yyyy-MM-dd"))" />
+
+                </div>
+
+                <div class="col-md-3">
+
+                    <label class="mb-2">
+                        End Date
+                    </label>
+
+                    <input type="date"
+                           name="endDate"
+                           class="form-control"
+                           value="@(Model.EndDate?.ToString("yyyy-MM-dd"))" />
+
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
+
+                    <button type="submit"
+                            class="btn btn-primary w-100">
+
+                        Apply Filters
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
     </div>
 
     <!-- KPI CARDS -->
@@ -18,31 +125,51 @@
     <div class="row mb-4">
 
         <div class="col-md-3">
+
             <div class="card shadow-sm border-0 p-3">
+
                 <h6>Total Logs</h6>
+
                 <h2>@Model.TotalLogs</h2>
+
             </div>
+
         </div>
 
         <div class="col-md-3">
+
             <div class="card shadow-sm border-0 p-3">
+
                 <h6>Total Hours</h6>
+
                 <h2>@Model.TotalHours</h2>
+
             </div>
+
         </div>
 
         <div class="col-md-3">
+
             <div class="card shadow-sm border-0 p-3">
+
                 <h6>Completed Tasks</h6>
+
                 <h2>@Model.Completed</h2>
+
             </div>
+
         </div>
 
         <div class="col-md-3">
+
             <div class="card shadow-sm border-0 p-3">
+
                 <h6>Pending Tasks</h6>
+
                 <h2>@Model.Pending</h2>
+
             </div>
+
         </div>
 
     </div>
@@ -50,50 +177,129 @@
     <!-- AI INSIGHT -->
 
     <div class="alert alert-info shadow-sm">
-        <strong>AI Insight:</strong> @Model.AIInsight
+
+        <strong>AI Insight:</strong>
+
+        @Model.AIInsight
+
     </div>
 
-    <!-- CHART -->
+    <!-- SYSTEM DISTRIBUTION CHART -->
 
     <div class="card shadow-sm border-0 p-4 mt-4">
 
-        <h5 class="mb-4">System Distribution</h5>
+        <h5 class="mb-4">
+            System Distribution
+        </h5>
 
         <div style="height:400px;">
+
             <canvas id="systemChart"></canvas>
+
         </div>
+
+    </div>
+
+    <!-- PRODUCTIVITY TREND -->
+
+    <div class="card shadow-sm border-0 p-4 mt-4">
+
+        <h5 class="mb-4">
+            Productivity Trend Analysis
+        </h5>
+
+        <div style="height:400px;">
+
+            <canvas id="trendChart"></canvas>
+
+        </div>
+
+    </div>
+
+    <!-- TOP EMPLOYEES -->
+
+    <div class="card shadow-sm border-0 p-4 mt-4">
+
+        <h5 class="mb-4">
+            Employee Performance Leaderboard
+        </h5>
+
+        <table class="table table-hover">
+
+            <thead>
+
+                <tr>
+
+                    <th>Employee</th>
+
+                    <th>Department</th>
+
+                    <th>Total Hours</th>
+
+                    <th>Completed Tasks</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @foreach (var emp in Model.TopEmployees)
+                {
+                    <tr>
+
+                        <td>@emp.EmployeeName</td>
+
+                        <td>@emp.Department</td>
+
+                        <td>@emp.TotalHours</td>
+
+                        <td>@emp.CompletedTasks</td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
 
     </div>
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 
     window.onload = function () {
 
-        const labels = @Html.Raw(
+        // SYSTEM DISTRIBUTION CHART
+
+        var systemLabels = @Html.Raw(
             System.Text.Json.JsonSerializer.Serialize(Model.SystemLabels)
             );
 
-        const values = @Html.Raw(
+        var systemValues = @Html.Raw(
             System.Text.Json.JsonSerializer.Serialize(Model.SystemValues)
             );
 
-        const ctx = document
-            .getElementById("systemChart")
-            .getContext("2d");
+        var systemCtx = document
+            .getElementById('systemChart')
+            .getContext('2d');
 
-        new Chart(ctx, {
+        new Chart(systemCtx, {
+
             type: 'doughnut',
 
             data: {
-                labels: labels,
+
+                labels: systemLabels,
 
                 datasets: [{
+
                     label: 'System Usage',
-                    data: values,
+
+                    data: systemValues,
 
                     backgroundColor: [
                         '#4e79a7',
@@ -102,13 +308,67 @@
                     ],
 
                     borderWidth: 1
+
                 }]
             },
 
             options: {
+
                 responsive: true,
+
                 maintainAspectRatio: false
+
             }
+
+        });
+
+        // PRODUCTIVITY TREND CHART
+
+        var trendLabels = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(Model.TrendLabels)
+            );
+
+        var trendValues = @Html.Raw(
+            System.Text.Json.JsonSerializer.Serialize(Model.TrendValues)
+            );
+
+        var trendCtx = document
+            .getElementById('trendChart')
+            .getContext('2d');
+
+        new Chart(trendCtx, {
+
+            type: 'line',
+
+            data: {
+
+                labels: trendLabels,
+
+                datasets: [{
+
+                    label: 'Total Hours Worked',
+
+                    data: trendValues,
+
+                    borderColor: '#4e79a7',
+
+                    backgroundColor: 'rgba(78,121,167,0.1)',
+
+                    fill: true,
+
+                    tension: 0.4
+
+                }]
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false
+
+            }
+
         });
 
     };
