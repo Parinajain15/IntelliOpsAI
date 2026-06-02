@@ -1,0 +1,6 @@
+{
+  "name": "IntelliOps AI",
+  "description": "AI-Powered Enterprise Operations Intelligence Platform that sits above company operations and ERP/SAP workflows to predict risks, detect anomalies, and generate intelligent recommendations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

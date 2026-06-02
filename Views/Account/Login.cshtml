@@ -1,0 +1,239 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - IntelliOps AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            700: '#1e293b',
+                            800: '#0f172a',
+                            900: '#020617'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.1.0/font/lucide.min.css"/>
+    <link rel="stylesheet" href="/css/site.css" />
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #020617 !important;
+            color: #94a3b8 !important;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Encapsulate style overrides in .login-card-container to completely prevent site.css from interfering */
+        .login-card-container input[type="text"],
+        .login-card-container input[type="password"] {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            border: 1px solid #334155 !important;
+            border-radius: 0.375rem !important;
+            padding-top: 0.625rem !important;
+            padding-bottom: 0.625rem !important;
+            padding-left: 2.75rem !important;
+            padding-right: 1rem !important;
+            font-size: 0.875rem !important;
+            line-height: normal !important;
+            width: 100% !important;
+            height: auto !important;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.4) !important;
+            transition: border-color 0.2s, box-shadow 0.2s !important;
+        }
+
+        .login-card-container input[type="text"]:focus,
+        .login-card-container input[type="password"]:focus {
+            border-color: #0ea5e9 !important;
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2) !important;
+            outline: none !important;
+        }
+
+        .login-card-container label {
+            font-size: 0.75rem !important;
+            font-weight: 600 !important;
+            color: #94a3b8 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            margin-bottom: 0.375rem !important;
+            display: inline-block !important;
+        }
+
+        .login-card-container input[type="checkbox"] {
+            width: 1rem !important;
+            height: 1rem !important;
+            border-radius: 0.25rem !important;
+            border: 1px solid #334155 !important;
+            background-color: #0f172a !important;
+            accent-color: #10b981 !important;
+            cursor: pointer !important;
+        }
+
+        .login-card-container .profile-btn {
+            background-color: #0f172a !important;
+            border: 1px solid #1e293b !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .login-card-container .profile-btn:hover {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            transform: translateX(4px) !important;
+        }
+
+        .bg-grid-pattern {
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="relative bg-navy-900 text-slate-300 min-h-screen flex items-center justify-center p-4 overflow-x-hidden">
+
+    <!-- Glowing Background blobs -->
+    <div class="pointer-events-none absolute top-1/4 left-1/4 -translate-y-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+    <div class="pointer-events-none absolute bottom-1/4 right-1/4 translate-y-1/2 translate-x-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+    
+    <!-- Grid Background -->
+    <div class="pointer-events-none absolute inset-0 bg-grid-pattern"></div>
+
+    <div class="login-card-container relative w-full max-w-4xl bg-[#0a101f]/95 rounded-xl border border-slate-800 shadow-2xl overflow-hidden grid md:grid-cols-12 backdrop-blur-md animate-fade-in z-10">
+        
+        <!-- Left Side: Interactive Login Form -->
+        <div class="p-8 md:col-span-7 flex flex-col justify-between">
+            <div>
+                <!-- Branding Header -->
+                <div class="flex items-center gap-3 mb-8">
+                    <span class="w-10 h-10 rounded bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-white font-bold text-xl select-none shadow-md shadow-emerald-500/20">I</span>
+                    <div>
+                        <h1 class="text-white font-semibold text-lg tracking-tight leading-none">IntelliOps AI</h1>
+                        <span class="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Enterprise Intelligence Security</span>
+                    </div>
+                </div>
+
+                <h2 class="text-white text-2xl font-bold tracking-tight mb-2">Welcome Back</h2>
+                <p class="text-slate-400 text-sm mb-6">Enter enterprise credentials to unlock the Executive Control Room.</p>
+
+                <!-- Validation Summary / Error Warnings -->
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-xs flex items-start gap-2.5">
+                        <i class="lucide-alert-circle text-base translate-y-0.5 shrink-0"></i>
+                        <div class="space-y-1 w-full">
+                            <strong class="font-semibold uppercase tracking-wider block">Access Gate Exception:</strong>
+                            <div asp-validation-summary="All" class="leading-relaxed list-inside font-medium"></div>
+                        </div>
+                    </div>
+                }
+
+                <form asp-action="Login" method="post" class="space-y-4">
+                    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+                    
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5" for="email">User Email / ID</label>
+                        <div class="relative">
+                            <i class="lucide-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="text" id="email" name="email" required placeholder="name@intelliops.ai" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5" for="password">Security Password</label>
+                        <div class="relative">
+                            <i class="lucide-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="password" id="password" name="password" required placeholder="••••••••" />
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1">
+                        <label class="flex items-center gap-2 text-xs text-slate-400 cursor-pointer select-none">
+                            <input type="checkbox" name="rememberMe" value="true" />
+                            <span>Keep session authenticated</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="w-full mt-6 py-2.5 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white font-bold text-sm rounded-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-emerald-500/10 hover:shadow-cyan-500/20 flex items-center justify-center gap-2 border-0">
+                        <i class="lucide-shield-check text-base"></i>
+                        <span>Secure Authorization Check</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Footer micro-copy -->
+            <div class="mt-8 pt-4 border-t border-slate-800/60 flex justify-between text-[10px] text-slate-500">
+                <span>IntelliOps AI v4.8</span>
+                <span>Protected by Standard Identity</span>
+            </div>
+        </div>
+
+        <!-- Right Side: Seeded Testing Profiles Quick-Selector -->
+        <div class="bg-slate-900 p-8 md:col-span-5 border-t md:border-t-0 md:border-l border-slate-800/80 flex flex-col justify-between">
+            <div>
+                <h3 class="text-white text-base font-bold tracking-tight mb-3 flex items-center gap-2">
+                    <i class="lucide-user-check text-emerald-400 text-sm"></i>
+                    <span>Seeded Security Profiles</span>
+                </h3>
+                <p class="text-slate-400 text-xs leading-relaxed mb-6">
+                    Authorized testing keys are preloaded in the local database. Click a profile to fill credentials instantly:
+                </p>
+
+                <!-- Profile Cards -->
+                <div class="space-y-3">
+                    <button type="button" onclick="fillCreds('director@intelliops.ai', 'IntelliOps123!')" 
+                        class="profile-btn w-full text-left p-3.5 rounded-lg group">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-semibold text-white group-hover:text-cyan-400 transition-colors">Director (C-Suite)</span>
+                            <span class="text-[9px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 uppercase font-semibold px-1.5 py-0.5 rounded">All Views</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">Full insights access & autonomous briefings builder.</p>
+                    </button>
+
+                    <button type="button" onclick="fillCreds('manager@intelliops.ai', 'IntelliOps123!')" 
+                        class="profile-btn w-full text-left p-3.5 rounded-lg group">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-semibold text-white group-hover:text-cyan-400 transition-colors">Operations Manager</span>
+                            <span class="text-[9px] bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 uppercase font-semibold px-1.5 py-0.5 rounded">Ops Control</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">Manage incidents, upload CSVs, & sync ERP gateways.</p>
+                    </button>
+
+                    <button type="button" onclick="fillCreds('lead@intelliops.ai', 'IntelliOps123!')" 
+                        class="profile-btn w-full text-left p-3.5 rounded-lg group">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-semibold text-white group-hover:text-cyan-400 transition-colors">Team Lead</span>
+                            <span class="text-[9px] bg-purple-500/10 border border-purple-500/20 text-purple-400 uppercase font-semibold px-1.5 py-0.5 rounded">Local Leads</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 mt-1">Perform daily manual intake & clear team workload.</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="mt-6 p-3 bg-slate-950/40 border border-slate-800/30 rounded text-[11px] text-slate-400 leading-relaxed">
+                <strong>Hashing Signature:</strong> Password hashes are generated dynamically using PBKDF2 with HMAC-SHA256 configuration.
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Interactive script to pre-fill info -->
+    <script>
+        function fillCreds(email, password) {
+            document.getElementById('email').value = email;
+            document.getElementById('password').value = password;
+        }
+    </script>
+</body>
+</html>

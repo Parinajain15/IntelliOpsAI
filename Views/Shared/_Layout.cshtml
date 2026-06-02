@@ -1,0 +1,225 @@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    var currentPath = Context.Request.Path.Value?.ToLower().TrimEnd('/') ?? "";
+    if (string.IsNullOrEmpty(currentPath))
+    {
+        currentPath = "/";
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - IntelliOps AI</title>
+    <!-- Tailwind CSS CDN for high fidelity, frictionless rendering -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            50: '#f0f3f9',
+                            100: '#dce3f1',
+                            700: '#1b2a4a',
+                            850: '#121c32',
+                            900: '#0b1329'
+                        },
+                        accent: {
+                            emerald: '#10b981',
+                            cyan: '#0ea5e9'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons CDN Script -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Enterprise custom stylesheet asset -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="bg-gray-50 flex h-screen overflow-hidden">
+
+    <!-- Sidebar Wrapper -->
+    <aside class="w-64 bg-navy-900 border-r border-[#1e293b] flex flex-col h-full text-slate-300 select-none shrink-0" id="sidebar">
+        <!-- Brand identity header -->
+        <div class="p-6 border-b border-[#1e293b] flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded bg-emerald-500 flex items-center justify-center text-white font-bold text-lg pointer-events-none mb-1">I</span>
+                <div>
+                    <h1 class="text-white font-semibold text-sm tracking-tight leading-none">IntelliOps AI</h1>
+                    <span class="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Enterprise Intelligence</span>
+                </div>
+            </div>
+        </div>
+
+         <!-- Sidebar Navigation list items -->
+        <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+            <!-- 1. Systems Overview -->
+            <span class="text-[10px] text-slate-500 font-semibold tracking-wider px-3 uppercase pointer-events-none block mb-2">Systems Overview</span>
+            
+            <a href="/" class="side-nav-link @(currentPath == "/" || currentPath == "/home" || currentPath == "/home/index" ? "side-nav-link-active" : "")">
+                <i data-lucide="layout-dashboard" class="w-4 h-4 text-slate-400"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <!-- 2. Ingestion -->
+            <span class="text-[10px] text-slate-500 font-semibold tracking-wider px-3 uppercase pointer-events-none block mt-6 mb-2">Ingestion</span>
+
+            <a href="/Upload" class="side-nav-link @(currentPath.StartsWith("/upload") ? "side-nav-link-active" : "")">
+                <i data-lucide="upload" class="w-4 h-4 text-slate-400"></i>
+                <span>CSV Data Loader</span>
+            </a>
+
+            <a href="/ManualEntry" class="side-nav-link @(currentPath.StartsWith("/manualentry") ? "side-nav-link-active" : "")">
+                <i data-lucide="file-text" class="w-4 h-4 text-slate-400"></i>
+                <span>Manual Transaction Desk</span>
+            </a>
+
+            <!-- 3. Engines & Integrations -->
+            <span class="text-[10px] text-slate-500 font-semibold tracking-wider px-3 uppercase pointer-events-none block mt-6 mb-2">Engines & Integrations</span>
+
+            <a href="/Integrations" class="side-nav-link @(currentPath.StartsWith("/integrations") ? "side-nav-link-active" : "")">
+                <i data-lucide="network" class="w-4 h-4 text-slate-400"></i>
+                <span>Database Connectors</span>
+            </a>
+
+            <a href="/Alerts" class="side-nav-link @(currentPath.StartsWith("/alerts") ? "side-nav-link-active" : "")">
+                <i data-lucide="bell" class="w-4 h-4 text-slate-400"></i>
+                <span>Live Incident Center</span>
+            </a>
+
+            <!-- 4. Predictive Intelligence -->
+            <span class="text-[10px] text-slate-500 font-semibold tracking-wider px-3 uppercase pointer-events-none block mt-6 mb-2">Predictive Intelligence</span>
+
+            <a href="/Recommendations" class="side-nav-link @(currentPath.StartsWith("/recommendations") ? "side-nav-link-active" : "")">
+                <i data-lucide="activity" class="w-4 h-4 text-slate-400"></i>
+                <span>Mitigation Engine</span>
+            </a>
+
+            <a href="/AiInsights" class="side-nav-link @(currentPath.StartsWith("/aiinsights") ? "side-nav-link-active" : "")">
+                <i data-lucide="cpu" class="w-4 h-4 text-slate-400"></i>
+                <span>Executive Briefing Hub</span>
+            </a>
+
+            <!-- 5. Workflows -->
+            <span class="text-[10px] text-slate-500 font-semibold tracking-wider px-3 uppercase pointer-events-none block mt-6 mb-2">Workflows</span>
+            
+            <a href="#" class="side-nav-link opacity-60 hover:opacity-100 transition-opacity" onclick="event.preventDefault(); alert('Workflows Engine ready for task dispatch automation. Connect trigger source down-stream to initiate sequence.')">
+                <i data-lucide="git-branch" class="w-4 h-4 text-slate-400"></i>
+                <span>Standard Operations</span>
+            </a>
+
+            <!-- 6. System -->
+            <span class="text-[10px] text-slate-500 font-semibold tracking-wider px-3 uppercase pointer-events-none block mt-6 mb-2">System</span>
+
+            <a href="#" class="side-nav-link opacity-60 hover:opacity-100 transition-opacity" onclick="event.preventDefault(); alert('Audit logging active under all transactional views. Re-route to CSV download log review to see transaction details.')">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-slate-400"></i>
+                <span>Audit Ledger</span>
+            </a>
+        </nav>
+
+        <!-- Footer -->
+        <div class="p-4 border-t border-[#1e293b] text-[10px] text-slate-500 text-center select-none pointer-events-none">
+            IntelliOps AI Platform • .NET 8 MVC
+        </div>
+    </aside>
+
+    <!-- Main Workspace Frame -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden h-full">
+        <!-- Top Workspace Bar -->
+        <header class="h-16 bg-white border-b border-gray-200 px-8 flex items-center justify-between shrink-0">
+            <h2 class="text-base font-bold text-gray-900 tracking-tight" id="page-title">
+                @ViewData["Title"]
+            </h2>
+            <div class="flex items-center gap-6">
+                <!-- User Account Profile Display -->
+                <div class="flex items-center gap-4">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <div class="flex flex-col text-right">
+                            <span class="text-xs font-semibold text-slate-800 max-w-[160px] truncate" title="@User.Identity.Name">
+                                @User.Identity.Name
+                            </span>
+                            @if (ViewBag.ActiveRole != null)
+                            {
+                                <span class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">
+                                    @ViewBag.ActiveRole
+                                </span>
+                            }
+                        </div>
+                        
+                        <form action="/Account/Logout" method="post" id="logoutForm" class="m-0">
+                            <button type="submit" class="btn btn-secondary px-3 py-1.5 text-xs rounded-md shadow-sm hover:text-red-600 flex items-center gap-1.5 transition-all">
+                                <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                                <span>Logout</span>
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="user-x" class="w-4 h-4 text-slate-400"></i>
+                            <span class="text-xs font-medium text-slate-500">Guest Session</span>
+                        </div>
+                    }
+                </div>
+
+                <!-- Telemetry Live Connection -->
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-xs text-gray-500 font-medium">Telemetry Connection Live</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Body Workspace -->
+        <div class="flex-1 overflow-y-auto px-8 py-6">
+
+            <!-- Global Toast alerts for C# controller notification triggers -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="mb-5 p-4 rounded-lg border flex items-start gap-3 shadow-sm animate-fade-in toast-success bento-card">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mt-0.5 shrink-0"></i>
+                    <div>
+                        <strong class="text-xs font-bold uppercase tracking-widest block mb-0.5">Success Alert</strong>
+                        <p class="text-xs leading-relaxed">@TempData["Success"]</p>
+                    </div>
+                </div>
+            }
+
+            @if (TempData["Error"] != null)
+            {
+                <div class="mb-5 p-4 rounded-lg border flex items-start gap-3 shadow-sm animate-fade-in toast-error bento-card">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600 mt-0.5 shrink-0"></i>
+                    <div>
+                        <strong class="text-xs font-bold uppercase tracking-widest block mb-0.5">Critical Fault Warning</strong>
+                        <p class="text-xs leading-relaxed">@TempData["Error"]</p>
+                    </div>
+                </div>
+            }
+
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- Global Javascript functions for UI tabs or interactions -->
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script>
+        // Set page-title conditionally if view content updates it or if empty
+        const titleText = document.title.split(' - ')[0];
+        if (titleText && titleText !== 'Home Page' && titleText !== 'Index') {
+            const pt = document.getElementById('page-title');
+            if (pt) pt.textContent = titleText;
+        }
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

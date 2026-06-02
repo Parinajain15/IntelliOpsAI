@@ -1,0 +1,36 @@
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="max-w-xl mx-auto my-12 p-8 bg-white rounded-xl border border-red-200 shadow-lg text-center">
+    <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+        <i class="lucide-shield-alert text-3xl"></i>
+    </div>
+    
+    <h1 class="text-2xl font-bold text-gray-900 mb-2">Insufficient Role Approvals</h1>
+    <p class="text-sm text-gray-500 mb-6 leading-relaxed">
+        Your current authenticated account is not mapped to the required structural role required to access this endpoint or execute this operation.
+    </p>
+
+    <!-- Error specifications -->
+    <div class="bg-gray-50 border border-gray-100 rounded-lg p-4 text-left text-xs mb-8 space-y-2">
+        <div class="flex justify-between">
+            <span class="font-semibold text-gray-500 uppercase">Authenticated Identity:</span>
+            <span class="text-gray-800">@User.Identity?.Name</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="font-semibold text-gray-500 uppercase">Policy Warning:</span>
+            <span class="text-red-600 font-medium font-mono">ROLE_SECURITY_CONSTRAINT_BREACH</span>
+        </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="flex items-center justify-center gap-4">
+        <a href="/" class="px-5 py-2.5 bg-gray-900 border border-transparent rounded text-xs text-white font-medium hover:bg-gray-800 transition-colors">
+            Return to Dashboard
+        </a>
+        <a href="/Account/Login" class="px-5 py-2.5 bg-white border border-gray-300 rounded text-xs text-gray-700 font-medium hover:bg-gray-50 transition-colors">
+            Switch View Account
+        </a>
+    </div>
+</div>

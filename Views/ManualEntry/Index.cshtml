@@ -1,0 +1,198 @@
+@model IntelliOps.Models.ManualEntryViewModel
+@{
+    ViewData["Title"] = "Operational Intake Register";
+}
+
+<div class="space-y-8 max-w-6xl mx-auto animate-fade-in">
+
+    <!-- Grid: Double Intake Action Forms -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- Action Card 1: Schedule Operational Task (Work Order) -->
+        <div class="bento-card p-6">
+            <div class="flex items-center gap-3 border-b border-gray-100 pb-3 mb-4">
+                <span class="w-7 h-7 rounded-full bg-cyan-50 border border-cyan-105 flex items-center justify-center text-cyan-600">
+                    <i class="lucide-calendar text-xs"></i>
+                </span>
+                <h3 class="font-bold text-gray-900 text-sm">Schedule Operational Work Order</h3>
+            </div>
+            
+            <form action="/ManualEntry/ScheduleTask" method="post" class="space-y-4 text-xs font-semibold text-gray-700">
+                <div>
+                    <label class="block mb-1 text-gray-600">Task Title / Incident Brief *</label>
+                    <input type="text" name="title" required placeholder="Perform weekly capacity health assessment" 
+                        class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-1 text-gray-600">Target Queue Department *</label>
+                        <select name="department" class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500">
+                            @foreach (var dept in Model.Departments)
+                            {
+                                <option value="@dept">@dept</option>
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-gray-600">Staff Assigned *</label>
+                        <select name="employee" class="w-full rounded border border-gray-205 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500">
+                            @foreach (var emp in Model.Employees)
+                            {
+                                <option value="@emp">@emp</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-1 text-gray-600">Required Operation Hours *</label>
+                        <input type="number" name="hours" min="1" max="60" required placeholder="8" 
+                            class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500" />
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-gray-650">Criticality Priority *</label>
+                        <select name="priority" class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500">
+                            <option value="Low">Low Priority</option>
+                            <option value="Medium" selected>Medium Priority</option>
+                            <option value="High">High Priority</option>
+                            <option value="Critical">Critical Priority</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block mb-1 text-gray-600">Technical Notes / Specs *</label>
+                    <textarea name="notes" rows="2" required placeholder="Provide clear task scope parameters..." 
+                        class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary text-xs px-4 py-2">
+                    Schedule Work Order
+                </button>
+            </form>
+        </div>
+
+        <!-- Action Card 2: Report Active Live Incident -->
+        <div class="bento-card p-6">
+            <div class="flex items-center gap-3 border-b border-gray-100 pb-3 mb-4">
+                <span class="w-7 h-7 rounded-full bg-red-50 border border-red-105 flex items-center justify-center text-red-650">
+                    <i class="lucide-alert-octagon text-xs"></i>
+                </span>
+                <h3 class="font-bold text-gray-900 text-sm">Log Live Operational Incident</h3>
+            </div>
+            
+            <form action="/ManualEntry/LogIncident" method="post" class="space-y-4 text-xs font-semibold text-gray-750">
+                <div>
+                    <label class="block mb-1 text-gray-600">Incident Event Case *</label>
+                    <input type="text" name="message" required placeholder="Outage: SAP dispatch interface server timed out" 
+                        class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block mb-1 text-gray-600">Triggering Sector *</label>
+                        <select name="department" class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-850 focus:outline-none focus:border-cyan-500">
+                            @foreach (var dept in Model.Departments)
+                            {
+                                <option value="@dept">@dept</option>
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-1 text-gray-600">Incident Severity Category *</label>
+                        <select name="type" class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500">
+                            <option value="CRITICAL">Outage: CRITICAL FAILURE</option>
+                            <option value="WARNING" selected>Anomalous Warning Check</option>
+                            <option value="NOMINAL">Intel: System Nominal State</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block mb-1 text-gray-600">Default Field Operator *</label>
+                        <select name="operator" class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-850 focus:outline-none focus:border-cyan-500">
+                            @foreach (var emp in Model.Employees)
+                            {
+                                <option value="@emp">@emp</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <p class="text-[10px] text-gray-400 font-medium leading-relaxed">
+                    Submitting this form commits logs directly to the ledger, registers an alert block, and sets warnings flags.
+                </p>
+
+                <button type="submit" class="btn btn-primary text-xs px-4 py-2 mt-4">
+                    Commit Incident Log
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- Active Operational Queue Checklist log lists (Active checklists) -->
+    <div class="bento-card overflow-hidden flex flex-col">
+        <div class="px-6 py-4 border-b border-gray-150 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-gray-900">Assigned Workspace Task Checklist</h3>
+            <span class="text-[10px] text-gray-400 font-semibold">Scheduled Active: @Model.Tasks.Count checklist items</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-gray-700">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200">
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider">Title / Brief</th>
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider">Assigned staff</th>
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider">Category</th>
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider">Operational Target</th>
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider">Status Badge</th>
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider text-right">Capacity Hours</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @if (Model.Tasks != null && Model.Tasks.Any())
+                    {
+                        foreach (var task in Model.Tasks)
+                        {
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="px-6 py-4">
+                                    <h5 class="font-bold text-gray-900 text-xs">@task.Notes</h5>
+                                    <span class="text-[10px] text-gray-400 block mt-0.5">Assigned profile: @task.AssignedEmployeeName</span>
+                                </td>
+                                <td class="px-6 py-4 text-slate-800 font-medium font-sans">@task.AssignedEmployeeName</td>
+                                <td class="px-6 py-4"><span class="px-1.5 py-0.5 bg-slate-100 border border-slate-205 rounded font-mono text-[9px] text-[#475569] font-bold">@task.DepartmentName</span></td>
+                                <td class="px-6 py-4">
+                                    <span class="px-2 py-0.5 rounded text-[10.5px] font-semibold border
+                                        @(task.PriorityLevel == "Low" ? "bg-slate-50 text-slate-600 border-slate-200" :
+                                          task.PriorityLevel == "Medium" ? "bg-cyan-50 text-cyan-700 border-cyan-100" :
+                                          task.PriorityLevel == "High" ? "bg-amber-50 text-amber-700 border-amber-100" :
+                                          "bg-red-50 text-red-700 border-red-100")">
+                                        @task.PriorityLevel Priority
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="text-[10px] font-bold uppercase tracking-tight
+                                        @(task.Status == "Pending" ? "text-red-650 animate-pulse" :
+                                          task.Status == "In Progress" ? "text-cyan-600" :
+                                          "text-emerald-600")">
+                                        @task.Status
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 font-mono font-bold text-right text-gray-650 text-xs">@task.HoursWorked hrs</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="px-6 py-8 text-center text-gray-400 text-xs">No checklist operational actions schedule for current workload yet.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

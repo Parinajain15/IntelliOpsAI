@@ -1,0 +1,179 @@
+@model List<IntelliOps.Models.AiInsightLog>
+@{
+    ViewData["Title"] = "Autonomous C-Suite Intelligence";
+}
+
+<div class="space-y-8 max-w-5xl mx-auto">
+    
+    <!-- Header panel with trigger compilations button -->
+    <div class="bento-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="max-w-2xl">
+            <h3 class="font-bold text-gray-900 text-sm">C-Suite Intelligence Reporting Engine</h3>
+            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                Compile real-time telemetry inputs (active tasks, breach rates, database errors) and communicate directly 
+                with Gemini models or OpenRouter endpoints via .NET HttpClient. Stores executive memos directly into SQL Server.
+            </p>
+        </div>
+        
+        <!-- Post action form to compile new briefing -->
+        <form action="/AiInsights/GenerateBriefing" method="post" class="shrink-0 self-start md:self-center">
+            <button type="submit" class="btn btn-primary text-xs px-5 py-2.5 flex items-center gap-2">
+                <i class="lucide-sparkles text-[11px] text-yellow-300"></i>
+                Compile New AI Briefing
+            </button>
+        </form>
+    </div>
+
+    <!-- Active Compilation Progress Terminal (Mock/Simulated output during loads) -->
+    @if (TempData["Compiling"] != null)
+    {
+        <div class="terminal-block">
+            <div class="flex justify-between items-center border-b border-[#1e293b] pb-2 mb-3">
+                <span class="text-[10px] uppercase font-bold text-cyan-400">Telemetry Handshake Terminal</span>
+                <span class="text-[9px] text-[#ef4444] animate-pulse">In Progress</span>
+            </div>
+            <pre class="space-y-1 text-xs text-slate-300">
+&gt; Gathering operational indices from Database Tables... Done (17 Tasks loaded).
+&gt; Calculating weighted completion levels and average hours... Done.
+&gt; Marshalling telemetry context payload into strategic JSON format... Done.
+&gt; Initiating OpenRouter AI Endpoint request on HTTPClient... Done.
+&gt; Parsing response block structures into local storage indexes... Processing success.
+            </pre>
+        </div>
+    }
+
+    <!-- Historical Executive Briefings output lists -->
+    <div class="space-y-8">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var brief in Model)
+            {
+                <div class="bento-card p-6 relative">
+                    
+                    <!-- Title banner block -->
+                    <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-100 pb-4 mb-5 gap-4">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-cyan-50 border border-cyan-100 flex items-center justify-center text-cyan-600">
+                                <i class="lucide-file-text text-sm"></i>
+                            </span>
+                            <div>
+                                <h4 class="font-bold text-gray-900 text-xs">AI Operations Briefing Note</h4>
+                                <span class="text-[9px] text-gray-400 font-semibold uppercase">Compiled timestamp: @brief.Timestamp.ToString("yyyy-MM-dd HH:mm:ss") (UTC)</span>
+                            </div>
+                        </div>
+
+                        <!-- Delete action -->
+                        <form action="/AiInsights/DeleteBriefing" method="post" onsubmit="return confirm('Delete this executive briefing log from db?')" class="inline">
+                            <input type="hidden" name="id" value="@brief.Id" />
+                            <button type="submit" class="btn btn-danger text-xs px-3 py-1.5">
+                                Delete Record
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Executive Summary Memo content -->
+                    <div class="mb-6 leading-relaxed text-xs text-slate-700 bg-slate-50 border border-slate-100 rounded-lg p-5">
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-1">C-Suite Executive Summary</span>
+                        @brief.ExecutiveSummary
+                    </div>
+
+                    <!-- Two columns dynamic metric details -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs border-b border-gray-100 pb-6 mb-6">
+                        
+                        <!-- Col 1: Risks and Queue issues -->
+                        <div class="space-y-4">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-red-600 tracking-wider">Strategic Level Outage Risks</span>
+                                <ul class="mt-2 space-y-2">
+                                    @foreach (var risk in brief.TopRisks)
+                                    {
+                                        <li class="flex items-start gap-2 text-gray-650">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-red-550 mt-1.5 shrink-0"></span>
+                                            <p class="mt-0.5">@risk</p>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-amber-500 tracking-wider">Operational Queue Anomalies</span>
+                                <ul class="mt-2 space-y-2">
+                                    @foreach (var issue in brief.DepartmentIssues)
+                                    {
+                                        <li class="flex items-start gap-2 text-gray-650">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mt-1.5 shrink-0"></span>
+                                            <p class="mt-0.5">@issue</p>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Col 2: SLA concerns & BOTTLENECKS -->
+                        <div class="space-y-4">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-cyan-500 tracking-wider">Enterprise SLA & Backlog Bottlenecks</span>
+                                <ul class="mt-2 space-y-2">
+                                    @foreach (var bottle in brief.Bottlenecks)
+                                    {
+                                        <li class="flex items-start gap-2 text-gray-650 font-medium">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-555 mt-1.5 shrink-0"></span>
+                                            <p class="mt-0.5">@bottle</p>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-indigo-500 tracking-wider">SAP Module Connection Concerns</span>
+                                <ul class="mt-2 space-y-2">
+                                    @foreach (var concern in brief.SapConcerns)
+                                    {
+                                        <li class="flex items-start gap-2 text-gray-650">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-1.5 shrink-0"></span>
+                                            <p class="mt-0.5">@concern</p>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Recommended mitigations list (24 Hour Action checklist) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-emerald-600 tracking-wider">Actionable Recommendations</span>
+                            <ul class="mt-2 space-y-2">
+                                @foreach (var action in brief.RecommendedActions)
+                                {
+                                    <li class="flex items-start gap-2 text-gray-650">
+                                        <span class="w-4 h-4 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center font-bold text-[8px] mt-0.5 shrink-0">✓</span>
+                                        <p class="mt-0.5">@action</p>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-800 tracking-wider">24H Operations Action Plan</span>
+                            <ul class="mt-2 space-y-2">
+                                @foreach (var plan in brief.PriorityPlan24h)
+                                {
+                                    <li class="bg-slate-50 border border-slate-100 rounded-lg p-2.5 flex items-center gap-3">
+                                        <i class="lucide-check-circle text-emerald-500 text-xs shrink-0 select-none"></i>
+                                        <span class="font-semibold text-slate-700">@plan</span>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+            }
+        }
+        else
+        {
+            <div class="bento-card p-12 text-center text-slate-400 text-xs">
+                No archived C-Suite Intel notes inside database yet. Click "Compile New AI Briefing" to run calculations.
+            </div>
+        }
+    </div>
+</div>
