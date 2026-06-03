@@ -1,0 +1,290 @@
+@model List<IntelliOps.Models.ConsolidatedIncident>
+@{
+    ViewData["Title"] = "Root Cause Incident Desk";
+}
+
+<div class="space-y-8">
+    
+    <!-- Header Summary Alerts -->
+    <div class="bento-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="max-w-xl">
+            <h3 class="font-bold text-gray-900 text-sm">Active Enterprise Operational Blockers</h3>
+            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                Review and resolve active system outages, database synchronization checks, and logistical bottlenecks. 
+                Move the status of alerts from open, assign owners, and write Root Cause Analysis (RCA) comments to coordinate efforts.
+            </p>
+        </div>
+        <!-- Trigger Modal button or layout -->
+        <button onclick="document.getElementById('incident-modal').classList.toggle('hidden')" class="btn btn-primary text-xs px-4 py-2 shrink-0 self-start">
+            File New Incident
+        </button>
+    </div>
+
+    <!-- Hidden inline filing Modal -->
+    <div id="incident-modal" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-6 shadow-md transition-all">
+        <div class="flex items-center justify-between mb-4 border-b border-gray-150 pb-2">
+            <h4 class="font-bold text-xs text-gray-900 uppercase tracking-widest">File New System Outage</h4>
+            <button onclick="document.getElementById('incident-modal').classList.add('hidden')" class="text-slate-400 hover:text-slate-900 font-bold font-mono">X</button>
+        </div>
+        <form action="/Alerts/FileIncident" method="post" class="space-y-4 text-xs max-w-2xl">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Incident Title *</label>
+                    <input type="text" name="title" required placeholder="Database timeout, etc..." class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500" />
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Queue Department *</label>
+                    <select name="department" required class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500">
+                        <option value="Supply Chain">Supply Chain</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Quality Assurance">Quality Assurance</option>
+                        <option value="Customer Support">Customer Support</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Severity Priority Graveness</label>
+                    <select name="severity" class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500">
+                        <option value="Low">Low</option>
+                        <option value="Moderate" selected>Moderate</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical Outage</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-1">Default Field Owner</label>
+                    <select name="assignedOwner" class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-850 focus:outline-none focus:border-cyan-500">
+                        @if (ViewBag.Employees != null)
+                        {
+                            foreach (var emp in (List<IntelliOps.Models.Employee>)ViewBag.Employees)
+                            {
+                                <option value="@emp.Name">@emp.Name (@emp.Department)</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-gray-700 font-semibold mb-1">Trigger Description *</label>
+                <textarea name="description" rows="3" required placeholder="Detail what triggered the outage, symptoms, estimated blast radius etc..." class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-855 focus:outline-none  focus:border-cyan-500"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary px-4 py-2 text-xs">Submit Outage Ticket</button>
+        </form>
+    </div>
+
+    <!-- Quick filter tabs & metadata telemetry displays -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-50 border border-slate-200/80 p-3 rounded-xl shadow-xs">
+        <div class="flex items-center gap-1.5 bg-gray-200 p-0.5 rounded-lg w-fit text-xs font-semibold select-none">
+            <a href="/Alerts?viewMode=Active" id="btn-show-active" class="px-4 py-1.5 rounded-md transition-all font-semibold cursor-pointer @(ViewBag.ViewMode == "Active" ? "bg-white text-gray-900 shadow-xs font-bold" : "text-gray-550 hover:text-gray-800")">
+                Active Incidents
+            </a>
+            <a href="/Alerts?viewMode=All" id="btn-show-all" class="px-4 py-1.5 rounded-md transition-all font-semibold cursor-pointer @(ViewBag.ViewMode == "All" ? "bg-white text-gray-900 shadow-xs font-bold" : "text-gray-550 hover:text-gray-800")">
+                Historical Archive (All)
+            </a>
+        </div>
+        
+        <div class="flex items-center gap-4 text-xs font-semibold">
+            <div class="inline-flex items-center gap-1">
+                <span class="text-slate-400 text-[10px] uppercase font-bold">Active Incidents:</span>
+                <span class="bg-red-50 text-red-700 border border-red-100 px-2 py-0.5 rounded font-mono font-bold">@ViewBag.ConsolidatedCount</span>
+            </div>
+            <div class="inline-flex items-center gap-1 border-l border-slate-200 pl-4">
+                <span class="text-slate-400 text-[10px] uppercase font-bold">Raw Signals:</span>
+                <span class="bg-slate-100 text-slate-800 border border-slate-200 px-2 py-0.5 rounded font-mono font-bold">@ViewBag.RawSignalsCount</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Outages Card list grid -->
+    <div class="grid grid-cols-1 gap-6">
+        @foreach (var alert in Model)
+        {
+            var comments = alert.Signals.SelectMany(s => s.Comments).OrderByDescending(c => c.Timestamp).ToList();
+
+            <div class="bento-card p-6 flex flex-col justify-between alert-card" data-status="@alert.Status">
+                
+                <!-- Card Header -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-gray-150 pb-4 mb-4 gap-4">
+                    <div>
+                        <div class="flex items-center gap-2.5">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border
+                                @(alert.Severity == "Critical" ? "bg-red-50 text-red-700 border-red-100" :
+                                  alert.Severity == "High" ? "bg-amber-100 text-amber-800 border-amber-250" :
+                                  "bg-slate-100 text-slate-700 border-slate-200")">
+                                @alert.Severity Priority
+                            </span>
+                            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">@alert.Department</span>
+                        </div>
+                        <h4 class="font-bold text-gray-900 text-base mt-2 flex items-center gap-2">
+                            <span>@alert.Title</span>
+                            <span class="text-xs text-slate-400 font-normal">(@alert.Signals.Count consolidated signals)</span>
+                        </h4>
+                    </div>
+
+                    <!-- Interactive Assignee Badge & Status dropdown trigger -->
+                    <div class="flex items-center gap-3">
+                        <div class="text-xs text-right hidden md:block">
+                            <span class="text-slate-400 text-[10px] block leading-none">Active Owner:</span>
+                            <span class="font-bold text-slate-800 block mt-1">@alert.AssignedOwner</span>
+                        </div>
+                        <span class="text-xs px-2.5 py-0.5 rounded font-bold uppercase tracking-tight
+                            @(alert.Status == "Open" ? "bg-red-55 border border-red-200 text-red-705" :
+                              alert.Status == "In Progress" ? "bg-cyan-50 border border-cyan-250 text-cyan-750 animate-pulse" :
+                              "bg-emerald-50 border border-emerald-250 text-emerald-700")">
+                            @alert.Status
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Description content -->
+                <div class="text-xs text-slate-650 leading-relaxed mb-3">
+                    @alert.Description
+                </div>
+
+                <!-- Contributing alerts pills -->
+                <div class="flex flex-wrap gap-1.5 mb-4">
+                    @foreach (var factor in alert.ContributingFactors)
+                    {
+                        <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-slate-100 border border-slate-200 text-slate-700">
+                            ⚡ @factor
+                        </span>
+                    }
+                </div>
+
+                <!-- Diagnostics & Raw Signals ledger - Collapsible to protect executive cleanliness -->
+                <details class="bg-slate-50 border border-slate-200 rounded-lg p-3.5 mb-4 text-xs transition duration-150">
+                    <summary class="font-bold text-slate-700 cursor-pointer hover:text-slate-950 select-none flex items-center justify-between text-[10px] uppercase tracking-wider outline-none">
+                        <span class="flex items-center gap-1.5">⚙️ Diagnostics & Raw Signals Ledger (@alert.Signals.Count)</span>
+                        <span class="text-[9px] text-slate-400 font-normal">Click to toggle ledger</span>
+                    </summary>
+                    <div class="mt-3.5 space-y-3 pl-1 border-t border-slate-200 pt-3">
+                        @foreach (var sig in alert.Signals)
+                        {
+                            <div class="border-b border-dashed border-slate-200 pb-2.5 last:border-0 last:pb-0">
+                                <div class="flex items-center justify-between gap-2.5 mb-1">
+                                    <span class="font-bold text-slate-800 text-[11px]">@sig.Title</span>
+                                    <span class="px-1.5 py-0.5 rounded text-[8px] font-mono uppercase bg-slate-200 text-slate-600 font-semibold">@sig.Severity</span>
+                                </div>
+                                <p class="text-slate-500 text-[10px] leading-relaxed">@sig.Description</p>
+                                <span class="text-[8px] text-slate-400 font-bold block mt-1">Generated: @sig.CreatedDate.ToString("yyyy-MM-dd HH:mm") (UTC) | Signal ID: @sig.Id</span>
+                            </div>
+                        }
+                    </div>
+                </details>
+
+                <!-- Resolution Detail Block if resolved -->
+                @if (alert.Status == "Resolved")
+                {
+                    <div class="bg-emerald-50/50 border border-emerald-100 rounded-lg p-3.5 mb-4 text-xs text-emerald-900 select-all">
+                        <strong class="text-emerald-950 font-bold block uppercase tracking-wider text-[10px]">RCA Remediation Solution:</strong>
+                        <p class="mt-1 leading-relaxed">@alert.Signals.FirstOrDefault(s => !string.IsNullOrEmpty(s.ResolutionNotes))?.ResolutionNotes</p>
+                        <span class="text-[9px] text-emerald-600/70 block mt-2">Closed workflow date: @alert.CreatedDate.ToString("yyyy-MM-dd HH:mm") (UTC)</span>
+                    </div>
+                }
+
+                <!-- Actions section: Update Assignment / Mitigate Outage / Comments -->
+                <div class="border-t border-gray-100 pt-4 flex flex-col md:flex-row gap-6 justify-between">
+                    
+                    <!-- Form 1: Action form to change state/mitigate (Only visible if not resolved) -->
+                    @if (alert.Status != "Resolved")
+                    {
+                        <form action="/Alerts/UpdateAlert" method="post" class="flex flex-wrap items-end gap-3 max-w-2xl text-xs">
+                            <input type="hidden" name="id" value="@alert.Id" />
+                            
+                            <!-- Assignee selection -->
+                            <div>
+                                <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Reassign Owner</label>
+                                <select name="owner" class="rounded border border-gray-200 px-2.5 py-1.5 bg-white text-gray-850 font-medium h-[34px] focus:outline-none focus:border-cyan-500">
+                                    @if (ViewBag.Employees != null)
+                                    {
+                                        foreach (var emp in (List<IntelliOps.Models.Employee>)ViewBag.Employees)
+                                        {
+                                            <option value="@emp.Name" selected="@(emp.Name == alert.AssignedOwner ? "selected" : null)">@emp.Name</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- Transition Status -->
+                            <div>
+                                <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">New State</label>
+                                <select name="status" onchange="toggleResolutionNotes(this, '@alert.Id')" class="rounded border border-gray-200 px-2.5 py-1.5 bg-white text-gray-850 font-medium select-state h-[34px] focus:outline-none focus:border-cyan-500">
+                                    <option value="Open" selected="@(alert.Status == "Open" ? "selected" : null)">Open</option>
+                                    <option value="In Progress" selected="@(alert.Status == "In Progress" ? "selected" : null)">In Progress</option>
+                                    <option value="Resolved" selected="@(alert.Status == "Resolved" ? "selected" : null)">Resolved</option>
+                                </select>
+                            </div>
+
+                            <!-- Resolution Notes box (hidden unless status value is set to Resolved) -->
+                            <div class="hidden notes-@alert.Id">
+                                <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Resolution RCA NOTES</label>
+                                <input type="text" name="resolutionNotes" placeholder="Explain the root cause solution..." class="rounded border border-gray-200 px-2.5 py-1.5 w-64 text-gray-800 h-[34px] focus:outline-none focus:border-cyan-500" />
+                            </div>
+
+                            <!-- RCA Comments string -->
+                            <div>
+                                <label class="block text-[10px] text-gray-400 uppercase font-bold mb-1">Add Analysis Remarks</label>
+                                <input type="text" name="remarks" placeholder="Type comments..." class="rounded border border-gray-200 px-2.5 py-1.5 w-48 text-gray-800 h-[34px] focus:outline-none focus:border-cyan-500" />
+                            </div>
+
+                            <button type="submit" class="btn btn-primary px-4 py-1.5 text-xs h-[34px]">Execute Update</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="text-[10px] text-gray-400 self-center font-bold tracking-wider uppercase bg-slate-50 border border-slate-200 px-2.5 py-1 rounded">ARCHIVED: Incidents log is read-only.</div>
+                    }
+
+                    <!-- Section: Outage discussions list -->
+                    <div class="w-full md:w-96 border-l border-gray-100 pl-4">
+                        <span class="text-[10px] uppercase font-bold text-gray-400 mb-2 block tracking-wider">Mitigation Thread (@comments.Count)</span>
+                        <div class="space-y-3.5 max-h-40 overflow-y-auto pr-1">
+                            @if (comments.Any())
+                            {
+                                foreach (var comment in comments)
+                                {
+                                    <div class="bg-slate-50/70 border border-slate-100 rounded-lg p-2.5 text-[11px] leading-relaxed">
+                                        <div class="flex justify-between text-[9px] text-gray-400 font-semibold border-b border-gray-100 pb-0.5 mb-1 select-none">
+                                            <span class="text-slate-600 font-bold">@comment.User</span>
+                                            <span>@comment.Timestamp.ToString("HH:mm")</span>
+                                        </div>
+                                        <p class="text-gray-700">@comment.Text</p>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-[10px] text-slate-400 block pb-1 italic">No RCA comments available. Add remarks using the update widget left.</span>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    function toggleResolutionNotes(selectElement, alertId) {
+        const notesBox = document.querySelector(`.notes-${alertId}`);
+        if (notesBox) {
+            if (selectElement.value === "Resolved") {
+                notesBox.classList.remove("hidden");
+                notesBox.querySelector('input').setAttribute('required', 'required');
+            } else {
+                notesBox.classList.add("hidden");
+                notesBox.querySelector('input').removeAttribute('required');
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("Operational Incidents loaded under view mode: @ViewBag.ViewMode");
+    });
+</script>

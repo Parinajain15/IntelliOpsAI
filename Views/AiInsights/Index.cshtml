@@ -1,0 +1,528 @@
+@model List<IntelliOps.Models.AiInsightLog>
+@{
+    ViewData["Title"] = "Executive AI Insights Center";
+    bool isEmptyState = ViewBag.IsEmptyState ?? true;
+}
+
+<div class="space-y-8 max-w-6xl mx-auto">
+
+    <!-- Header Panel -->
+    <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-xl p-8 border border-slate-700/50 shadow-lg relative overflow-hidden">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(6,182,212,0.08),transparent)]"></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="max-w-3xl">
+                <div class="flex items-center gap-2 text-cyan-400 text-xs font-semibold tracking-wider uppercase mb-2">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                    C-Suite Operations Intelligence Engine
+                </div>
+                <h1 class="font-bold text-gray-100 text-2xl tracking-tight">Executive AI Insights Center</h1>
+                <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                    Aggregate cross-functional telemetry to generate high-fidelity operational briefings. This module dynamically integrates active queues, SLA breaches, resource fatigue, and external database handshakes into a comprehensive business impact mapping. Upgraded with real-time semantic analysis and precision telemetry inputs.
+                </p>
+            </div>
+            
+            @if (!isEmptyState)
+            {
+                <form action="/AiInsights/GenerateBriefing" method="post" class="shrink-0">
+                    <button type="submit" class="w-full md:w-auto bg-cyan-500 hover:bg-cyan-450 text-slate-900 font-bold text-xs px-6 py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg transition-all duration-150">
+                        <i class="lucide-sparkles text-[13px] text-slate-900"></i>
+                        Generate New Analysis
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+
+    <!-- Active Compilation Progress Terminal (Shown during loads) -->
+    @if (TempData["Compiling"] != null)
+    {
+        <div class="bg-black/90 border border-slate-800 rounded-lg p-5 font-mono text-xs shadow-xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+                    <span class="text-[10px] uppercase font-bold text-cyan-400 tracking-wider">Dynamic Telemetry Handshake Terminal</span>
+                </div>
+                <span class="text-[9px] text-red-400 px-2 py-0.5 bg-red-950/50 border border-red-900/40 rounded uppercase font-bold animate-pulse">Re-Evaluating State</span>
+            </div>
+            <pre class="space-y-1.5 text-slate-300 overflow-x-auto whitespace-pre-wrap leading-relaxed">
+&gt; Initiating global operational recalculation sweeps...
+&gt; Gathering tasks, active alerts, and workforce workload coefficients... Done.
+&gt; Computing departmental risk matrices and workload scores... Completed.
+&gt; Resolving SLA breach vectors and predicted enterprise risks... 
+&gt; Submitting parsed telemetry payload to Google Gemini AI Engine... Processing.
+&gt; Serializing intelligence memo into local storage... Saved to Db.
+&gt; Recording system audit entry... Success.
+            </pre>
+        </div>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg p-4 text-xs font-medium flex items-center gap-2 shadow-sm">
+            <i class="lucide-check-circle text-emerald-600 text-sm shrink-0"></i>
+            @TempData["Success"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="bg-red-50 border border-red-200 text-red-800 rounded-lg p-4 text-xs font-medium flex items-center gap-2 shadow-sm">
+            <i class="lucide-alert-triangle text-red-600 text-sm shrink-0"></i>
+            @TempData["Error"]
+        </div>
+    }
+
+    <!-- EMPTY-STATE STATE -->
+    @if (isEmptyState)
+    {
+        <div class="bento-card py-16 px-8 text-center max-w-md mx-auto border border-gray-200 shadow-sm rounded-lg bg-white">
+            <div class="w-16 h-16 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mx-auto mb-6 text-slate-400">
+                <i class="lucide-database-backup text-2xl"></i>
+            </div>
+            <h3 class="font-bold text-gray-950 text-base leading-snug">No Operational Datasets Detected</h3>
+            <p class="text-xs text-gray-500 mt-2.5 max-w-sm mx-auto leading-relaxed">
+                Before generating C-Suite AI briefings, you must upload operational data. This guarantees that all executive insights represent true performance metrics without static mock data.
+            </p>
+            <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+                <a href="/Upload" class="inline-flex items-center justify-center bg-slate-900 hover:bg-slate-850 text-white font-semibold text-xs px-5 py-2.5 rounded-lg shadow-sm transition-all duration-150">
+                    <i class="lucide-upload-cloud text-xs mr-1.5"></i>
+                    Upload CSV DataSet
+                </a>
+                <a href="/ManualEntry" class="inline-flex items-center justify-center border border-gray-250 bg-white hover:bg-gray-50 text-gray-700 font-semibold text-xs px-5 py-2.5 rounded-lg shadow-sm transition-all duration-150">
+                    <span class="w-1.5 h-1.5 bg-yellow-450 rounded-full mr-2"></span>
+                    Manual Records Entry
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- METRICS OVERVIEW PANEL -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <!-- Metric 1 -->
+            <div class="bg-white border border-gray-150 p-5 rounded-lg shadow-sm flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-cyan-50 border border-cyan-100 flex items-center justify-center text-cyan-600">
+                    <i class="lucide-activity text-sm"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Overall Health Score</span>
+                    <h3 class="font-bold text-gray-900 text-lg leading-tight mt-0.5">@ViewBag.HealthScore <span class="text-xs text-slate-400 font-normal">/100</span></h3>
+                    <span class="text-[9px] font-semibold text-cyan-600 uppercase">Category: @ViewBag.HealthCategory</span>
+                </div>
+            </div>
+            <!-- Metric 2 -->
+            <div class="bg-white border border-gray-150 p-5 rounded-lg shadow-sm flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
+                    <i class="lucide-users text-sm"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Avg Staff Workload</span>
+                    <h3 class="font-bold text-gray-900 text-lg leading-tight mt-0.5">@ViewBag.AverageWorkload <span class="text-xs text-slate-400 font-normal">Hrs/Wk</span></h3>
+                    <span class="text-[9px] font-semibold text-amber-600 uppercase">Operational Force Fatigue</span>
+                </div>
+            </div>
+            <!-- Metric 3 -->
+            <div class="bg-white border border-gray-150 p-5 rounded-lg shadow-sm flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-red-50 border border-red-100 flex items-center justify-center text-red-600">
+                    <i class="lucide-alert-triangle text-sm"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Active Incident Count</span>
+                    <h3 class="font-bold text-gray-900 text-lg leading-tight mt-0.5">@ViewBag.ActiveIncidentCount <span class="text-xs text-slate-400 font-normal">Alerts</span></h3>
+                    <span class="text-[9px] font-semibold text-red-600 uppercase">Requiring Supervision</span>
+                </div>
+            </div>
+            <!-- Metric 4 -->
+            <div class="bg-white border border-gray-150 p-5 rounded-lg shadow-sm flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+                    <i class="lucide-trending-up text-sm"></i>
+                </div>
+                <div>
+                    <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Global SLA Breach Rate</span>
+                    <h3 class="font-bold text-gray-900 text-lg leading-tight mt-0.5">@ViewBag.SlaBreachRate<span class="text-xs text-slate-400 font-normal">%</span></h3>
+                    <span class="text-[9px] font-semibold text-indigo-600 uppercase">Queue Delivery Speed</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- OPERATIONAL METRICS SNAPSHOT SECTION -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 shadow-sm">
+            <div class="flex items-center gap-2 mb-4">
+                <i class="lucide-bar-chart-2 text-slate-700 text-sm"></i>
+                <h4 class="text-[11px] font-bold text-slate-800 uppercase tracking-wider">Operational Metrics Snapshot</h4>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
+                <!-- Card 1: Total Tasks -->
+                <div class="bg-white border border-gray-150 rounded-lg p-4 shadow-xs hover:border-slate-350 transition-colors duration-150 text-center sm:text-left">
+                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Total Tasks</span>
+                    <div class="flex items-baseline justify-center sm:justify-start gap-1 mt-1">
+                        <span class="font-bold text-slate-900 text-xl tracking-tight">@ViewBag.TotalTasksCount</span>
+                        <span class="text-[10px] text-slate-400">items</span>
+                    </div>
+                </div>
+
+                <!-- Card 2: Completed Tasks -->
+                <div class="bg-white border border-gray-150 rounded-lg p-4 shadow-xs hover:border-emerald-350 transition-colors duration-150 text-center sm:text-left">
+                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Completed</span>
+                    <div class="flex items-baseline justify-center sm:justify-start gap-1 mt-1">
+                        <span class="font-bold text-emerald-600 text-xl tracking-tight">@ViewBag.CompletedTasksCount</span>
+                        <span class="text-[10px] text-emerald-500">done</span>
+                    </div>
+                </div>
+
+                <!-- Card 3: In Progress Tasks -->
+                <div class="bg-white border border-gray-150 rounded-lg p-4 shadow-xs hover:border-indigo-350 transition-colors duration-150 text-center sm:text-left">
+                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">In Progress</span>
+                    <div class="flex items-baseline justify-center sm:justify-start gap-1 mt-1">
+                        <span class="font-bold text-indigo-600 text-xl tracking-tight">@ViewBag.InProgressTasksCount</span>
+                        <span class="text-[10px] text-indigo-400">active</span>
+                    </div>
+                </div>
+
+                <!-- Card 4: Pending Tasks -->
+                <div class="bg-white border border-gray-150 rounded-lg p-4 shadow-xs hover:border-amber-350 transition-colors duration-150 text-center sm:text-left">
+                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Pending</span>
+                    <div class="flex items-baseline justify-center sm:justify-start gap-1 mt-1">
+                        <span class="font-bold text-amber-500 text-xl tracking-tight">@ViewBag.PendingTasksCount</span>
+                        <span class="text-[10px] text-amber-400">queued</span>
+                    </div>
+                </div>
+
+                <!-- Card 5: Active Alerts -->
+                <div class="bg-white border border-gray-150 rounded-lg p-4 shadow-xs hover:border-red-350 transition-colors duration-150 text-center sm:text-left">
+                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Active Alerts</span>
+                    <div class="flex items-baseline justify-center sm:justify-start gap-1 mt-1">
+                        <span class="font-bold text-red-650 text-xl tracking-tight">@ViewBag.ActiveIncidentCount</span>
+                        <span class="text-[10px] text-red-500">cases</span>
+                    </div>
+                    <span class="text-[8px] font-mono font-bold text-slate-400 tracking-tight block mt-1">@ViewBag.RawSignalsCount RAW SIGNALS</span>
+                </div>
+
+                <!-- Card 6: SLA Breaches -->
+                <div class="bg-white border border-gray-150 rounded-lg p-4 shadow-xs hover:border-amber-350 transition-colors duration-150 text-center sm:text-left">
+                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">SLA Breaches</span>
+                    <div class="flex items-baseline justify-center sm:justify-start gap-1 mt-1">
+                        <span class="font-bold text-yellow-600 text-xl tracking-tight">@ViewBag.SlaBreachesCount</span>
+                        <span class="text-[10px] text-yellow-550">breached</span>
+                    </div>
+                </div>
+
+                <!-- Card 7: Avg Workload -->
+                <div class="bg-white border border-gray-150 rounded-lg p-4 shadow-xs hover:border-slate-350 transition-colors duration-150 text-center sm:text-left">
+                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Avg Workload</span>
+                    <div class="flex items-baseline justify-center sm:justify-start gap-0.5 mt-1">
+                        <span class="font-bold text-slate-800 text-xl tracking-tight">@ViewBag.AverageWorkload</span>
+                        <span class="text-[9px] text-slate-400 font-medium">h/wk</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BRIEFINGS SECTION -->
+        <div class="space-y-10">
+            @if (Model != null && Model.Any())
+            {
+                <div class="flex items-center justify-between border-b border-gray-200 pb-3">
+                    <h2 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                        <i class="lucide-history text-slate-500 text-xs"></i>
+                        C-Suite Executive AI Intelligence History
+                    </h2>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase">Showing @Model.Count Compiled Reports</span>
+                </div>
+
+                foreach (var briefing in Model)
+                {
+                    <div class="bg-white border border-gray-150 rounded-xl overflow-hidden shadow-md relative group transition-all duration-200 hover:shadow-lg">
+                        
+                        <!-- Top Bar Metadata -->
+                        <div class="bg-slate-50 border-b border-gray-150 px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <span class="w-9 h-9 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-cyan-400">
+                                    <i class="lucide-shield-check text-sm"></i>
+                                </span>
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="font-bold text-gray-900 text-xs">AI Operations Integrity Assessment</h4>
+                                        <span class="text-[9px] px-2 py-0.5 bg-slate-200 text-slate-700 font-bold rounded uppercase">Audit Verified</span>
+                                    </div>
+                                    <span class="text-[10px] text-gray-500 block mt-0.5">Last analysis generated at: <strong class="text-slate-800">@briefing.Timestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</strong> <span class="text-gray-400">(@briefing.Timestamp.ToString("HH:mm:ss") UTC)</span></span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center flex-wrap gap-4">
+                                <!-- Severity Badge -->
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Severity:</span>
+                                    @if (briefing.DisplaySeverity.Equals("Critical", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <span class="text-[9px] px-2.5 py-1 bg-red-500 text-white font-bold rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
+                                            <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                                            CRITICAL
+                                        </span>
+                                    }
+                                    else if (briefing.DisplaySeverity.Equals("High", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <span class="text-[9px] px-2.5 py-1 bg-amber-500 text-white font-bold rounded-full uppercase tracking-wider shadow-sm">
+                                            HIGH
+                                        </span>
+                                    }
+                                    else if (briefing.DisplaySeverity.Equals("Medium", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <span class="text-[9px] px-2.5 py-1 bg-blue-500 text-white font-bold rounded-full uppercase tracking-wider shadow-sm">
+                                            MEDIUM
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-[9px] px-2.5 py-1 bg-green-500 text-white font-bold rounded-full uppercase tracking-wider shadow-sm">
+                                            LOW
+                                        </span>
+                                    }
+                                </div>
+
+                                <!-- Confidence Score -->
+                                <div class="flex items-center gap-2 bg-slate-100 border border-slate-200 rounded-lg px-3 py-1">
+                                    <div>
+                                        <span class="text-[8px] font-bold text-slate-400 uppercase block tracking-wider leading-none">Confidence Score</span>
+                                        <span class="text-[11px] font-bold text-slate-700 leading-tight block mt-0.5">@briefing.DisplayConfidenceScore%</span>
+                                    </div>
+                                    <div class="w-16 bg-slate-250 h-1.5 rounded-full overflow-hidden shrink-0">
+                                        <div class="bg-cyan-500 h-full rounded-full" style="width: @briefing.DisplayConfidenceScore%"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Delete Trigger form -->
+                                <form action="/AiInsights/DeleteBriefing" method="post" onsubmit="return confirm('Conclude and delete this executive briefing report?')" class="inline">
+                                    <input type="hidden" name="id" value="@briefing.Id" />
+                                    <button type="submit" class="p-2 border border-slate-200 text-slate-400 hover:text-red-500 hover:bg-slate-50 rounded-lg transition-colors duration-150 shrink-0">
+                                        <i class="lucide-trash text-sm"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Main content panels -->
+                        <div class="p-6 space-y-6">
+                            
+                            <!-- Section 1: Executive Summary -->
+                            <div class="bg-slate-50/50 border border-slate-150 rounded-xl p-5 shadow-sm">
+                                <div class="flex items-center gap-1.5 mb-2.5">
+                                    <i class="lucide-file-text text-sm text-slate-700"></i>
+                                    <h5 class="text-[10px] font-bold text-slate-800 uppercase tracking-wider">EXECUTIVE SUMMARY</h5>
+                                </div>
+                                <p class="text-xs text-slate-750 leading-relaxed font-sans font-medium">
+                                    @briefing.DisplayExecutiveSummary
+                                </p>
+                            </div>
+
+                            <!-- Section 2: Key Risks & Top Overloaded Employees -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                
+                                <!-- KEY RISKS -->
+                                <div class="border border-gray-150 rounded-xl p-5 bg-white shadow-sm">
+                                    <div class="flex items-center gap-1.5 mb-3.5 border-b border-gray-100 pb-2.5">
+                                        <i class="lucide-shield-alert text-sm text-red-650"></i>
+                                        <h5 class="text-[10px] font-bold text-gray-800 uppercase tracking-wider">KEY RISKS</h5>
+                                    </div>
+                                    <ul class="space-y-3">
+                                        @foreach (var risk in briefing.TopRisks)
+                                        {
+                                            <li class="flex items-start gap-2 text-xs text-slate-700">
+                                                <span class="w-1.5 h-1.5 bg-red-500 rounded-full mt-1.5 shrink-0 shadow-sm"></span>
+                                                <p class="mt-0.5 leading-relaxed font-medium">@risk</p>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+
+                                <!-- TOP OVERLOADED EMPLOYEES -->
+                                <div class="border border-gray-150 rounded-xl p-5 bg-white shadow-sm">
+                                    <div class="flex items-center gap-1.5 mb-3.5 border-b border-gray-100 pb-2.5">
+                                        <i class="lucide-users text-sm text-yellow-600"></i>
+                                        <h5 class="text-[10px] font-bold text-gray-800 uppercase tracking-wider">TOP OVERLOADED EMPLOYEES</h5>
+                                    </div>
+                                    <ul class="space-y-3">
+                                        @foreach (var overload in briefing.Bottlenecks)
+                                        {
+                                            <li class="flex items-start gap-2 text-xs text-slate-700">
+                                                <span class="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-1.5 shrink-0 shadow-sm"></span>
+                                                <p class="mt-0.5 leading-relaxed font-medium">@overload</p>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+
+                            </div>
+
+                            <!-- Section 3: Critical Incidents & Recommended Actions -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                
+                                <!-- CRITICAL INCIDENTS -->
+                                <div class="border border-gray-150 rounded-xl p-5 bg-white shadow-sm">
+                                    <div class="flex items-center gap-1.5 mb-3.5 border-b border-gray-100 pb-2.5">
+                                        <i class="lucide-server-off text-sm text-cyan-600"></i>
+                                        <h5 class="text-[10px] font-bold text-gray-800 uppercase tracking-wider">CRITICAL INCIDENTS</h5>
+                                    </div>
+                                    <ul class="space-y-3">
+                                        @foreach (var incident in briefing.SapConcerns)
+                                        {
+                                            <li class="flex items-start gap-2 text-xs text-slate-700">
+                                                <span class="w-1.5 h-1.5 bg-cyan-500 rounded-full mt-1.5 shrink-0 shadow-sm"></span>
+                                                <p class="mt-0.5 leading-relaxed font-medium">@incident</p>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+
+                                <!-- AI RECOMMENDED ACTIONS -->
+                                <div class="border border-gray-150 rounded-xl p-5 bg-white shadow-sm">
+                                    <div class="flex items-center gap-1.5 mb-3.5 border-b border-gray-100 pb-2.5">
+                                        <i class="lucide-lightbulb text-sm text-emerald-600"></i>
+                                        <h5 class="text-[10px] font-bold text-gray-800 uppercase tracking-wider">AI RECOMMENDED ACTIONS</h5>
+                                    </div>
+                                    <ul class="space-y-3">
+                                        @foreach (var action in briefing.RecommendedActions)
+                                        {
+                                            <li class="flex items-start gap-2.5 text-xs text-slate-700">
+                                                <span class="w-4 h-4 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-250 flex items-center justify-center font-bold text-[9px] mt-0.5 shrink-0 shadow-sm select-none">✓</span>
+                                                <p class="mt-0.5 leading-relaxed font-medium">@action</p>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+
+                            </div>
+
+                            <!-- Section 4: Business Impact Analysis & 24H Action checklist -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+                                
+                                <!-- Business Impact Analysis -->
+                                <div class="md:col-span-2 bg-slate-50 border border-slate-150 rounded-xl p-5 shadow-sm">
+                                    <div class="flex items-center gap-1.5 mb-2.5">
+                                        <i class="lucide-trending-down text-sm text-slate-700"></i>
+                                        <h5 class="text-[10px] font-bold text-slate-800 uppercase tracking-wider">BUSINESS IMPACT ANALYSIS</h5>
+                                    </div>
+                                    <p class="text-xs text-slate-700 leading-relaxed font-medium font-sans">
+                                        @briefing.DisplayBusinessImpactAnalysis
+                                    </p>
+                                </div>
+
+                                <!-- 24H Operations Action Plan -->
+                                <div class="bg-slate-50 border border-slate-150 rounded-xl p-5 shadow-sm flex flex-col justify-between">
+                                    <div>
+                                        <div class="flex items-center gap-1.5 mb-3">
+                                            <i class="lucide-clipboard-check text-sm text-slate-800"></i>
+                                            <h5 class="text-[10px] font-bold text-slate-800 uppercase tracking-wider">24H Operations Action Plan</h5>
+                                        </div>
+                                        <ul class="space-y-2">
+                                            @foreach (var plan in briefing.PriorityPlan24h)
+                                            {
+                                                <li class="bg-white border border-slate-200 rounded-lg px-3 py-2 flex items-center gap-2">
+                                                    <i class="lucide-check-circle text-emerald-500 text-xs shrink-0 select-none"></i>
+                                                    <span class="font-semibold text-slate-700 text-[10px] leading-tight">@plan</span>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="bento-card py-16 px-8 text-center border border-gray-200 bg-white shadow-sm rounded-lg">
+                    <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mx-auto mb-4 text-slate-400">
+                        <i class="lucide-terminal text-lg"></i>
+                    </div>
+                    <h4 class="font-bold text-gray-900 text-sm">No Active Reports Compiled</h4>
+                    <p class="text-xs text-gray-500 mt-2 max-w-sm mx-auto leading-relaxed">
+                        Metrics are present in database. Click the "Generate New Analysis" button above to evaluate live datasets and compose your first AI operations briefing.
+                    </p>
+                </div>
+            }
+        </div>
+
+        <!-- OPERATIONAL CALCULATIONS & METRIC VALIDATION REFERENCE PANEL -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 shadow-sm mt-8 space-y-4">
+            <div class="flex items-center gap-2 border-b border-slate-200 pb-3">
+                <i class="lucide-calculator text-slate-700 w-5 h-5"></i>
+                <div>
+                    <h4 class="text-sm font-bold text-slate-900 tracking-tight">Analytical Metrics & Formula Validation Reference</h4>
+                    <p class="text-[10px] text-slate-500 font-medium">Compliance-verified audit rules governing C-Suite briefing analytics and risk thresholds</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-2">
+                <!-- Formula 1: Task Completion % -->
+                <div class="bg-white border border-slate-150 rounded-lg p-4 shadow-xs">
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[8px] font-bold bg-cyan-50 text-cyan-700 border border-cyan-200 font-mono uppercase mb-2">Metrics Definition</span>
+                    <h5 class="font-bold text-slate-800 text-xs font-sans">Task Completion Rate</h5>
+                    <div class="bg-slate-50 border border-slate-100 rounded p-2.5 my-2.5 font-mono text-[10px] text-slate-600 leading-normal">
+                        Completion % = (Completed Tasks / Total Tasks) × 100
+                    </div>
+                    <p class="text-[10px] text-slate-500 leading-relaxed font-sans font-medium">
+                        Evaluated dynamically against the active schedule ledger. Recalculated live from task records with hard status markers (<span class="font-semibold text-slate-700">Status == 'Completed'</span>).
+                    </p>
+                </div>
+
+                <!-- Formula 2: Active Alerts -->
+                <div class="bg-white border border-slate-150 rounded-lg p-4 shadow-xs">
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[8px] font-bold bg-red-50 text-red-700 border border-red-200 font-mono uppercase mb-2">System Alerts</span>
+                    <h5 class="font-bold text-slate-800 text-xs font-sans">Active Alerts Count</h5>
+                    <div class="bg-slate-50 border border-slate-100 rounded p-2.5 my-2.5 font-mono text-[10px] text-slate-600 leading-normal">
+                        Active Alerts = Count(Alerts [Status != 'Resolved'])
+                    </div>
+                    <p class="text-[10px] text-slate-500 leading-relaxed font-sans font-medium">
+                        Tracks open incidents logged manually or automatically triggered via continuous pipeline rules (workload burnout, SLA breach, delivery hazard, department overload).
+                    </p>
+                </div>
+
+                <!-- Formula 3: SLA Breaches -->
+                <div class="bg-white border border-slate-150 rounded-lg p-4 shadow-xs">
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[8px] font-bold bg-amber-50 text-amber-700 border border-amber-200 font-mono uppercase mb-2">SLA Tracking</span>
+                    <h5 class="font-bold text-slate-800 text-xs font-sans">SLA Breach Rate & Count</h5>
+                    <div class="bg-slate-50 border border-slate-100 rounded p-2.5 my-2.5 font-mono text-[10px] text-slate-600 leading-normal">
+                        Breach Rate = (Active Breached Tasks / Total Tasks) × 100
+                    </div>
+                    <p class="text-[10px] text-slate-500 leading-relaxed font-sans font-medium">
+                        Count of active items violating SLA thresholds. Filter rule selects: <span class="font-semibold text-slate-750">SlaBreached == true AND Status != 'Completed'</span>.
+                    </p>
+                </div>
+
+                <!-- Formula 4: Health Score -->
+                <div class="bg-white border border-slate-150 rounded-lg p-4 shadow-xs lg:col-span-2">
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[8px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 font-mono uppercase mb-2">Aggregation Engine</span>
+                    <h5 class="font-bold text-slate-800 text-xs font-sans">System Health Score Calculation</h5>
+                    <div class="bg-slate-50 border border-slate-100 rounded p-2.5 my-2.5 font-mono text-[10px] text-slate-650 leading-relaxed font-semibold">
+                        Health Score = 100 - SLA_Penalty - Alert_Penalty - Imbalance_Penalty - SAP_Penalty
+                    </div>
+                    <ul class="text-[9px] text-slate-500 space-y-1.5 list-disc list-inside font-sans font-medium">
+                        <li><span class="font-semibold text-slate-705">SLA Penalty (Max 25):</span> SLA Breach Rate × 100</li>
+                        <li><span class="font-semibold text-slate-705">Alert Penalty (Max 20):</span> Sum of Active Alerts weight (Critical = 10, High = 6, Moderate = 3, Low = 1)</li>
+                        <li><span class="font-semibold text-slate-705">Workload Imbalance (Max 10):</span> Penalty applied if staff weekly hours variance > 35 hours (-10) or > 20 hours (-5)</li>
+                        <li><span class="font-semibold text-slate-705">SAP Penalty (Max 10):</span> Offline integrations penalty (Offline Connectors Count × 5)</li>
+                    </ul>
+                </div>
+
+                <!-- Formula 5: Confidence Score -->
+                <div class="bg-white border border-slate-150 rounded-lg p-4 shadow-xs">
+                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[8px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 font-mono uppercase mb-2">Statistical Model</span>
+                    <h5 class="font-bold text-slate-800 text-xs font-sans">Model Confidence Rating</h5>
+                    <div class="bg-slate-50 border border-slate-100 rounded p-2.5 my-2.5 font-mono text-[10px] text-slate-600 leading-normal">
+                        Confidence = Min(98%, 65% base + RecordBoost + CompletenessBoost + AlertBoost + PredictionBoost)
+                    </div>
+                    <ul class="text-[9px] text-slate-500 space-y-1 list-disc list-inside font-sans font-medium">
+                        <li><span class="font-semibold text-slate-705">Record Boost:</span> Tasks Count >= 15 (+12), >= 8 (+8), > 0 (+4)</li>
+                        <li><span class="font-semibold text-slate-705">Completeness Boost:</span> +10 matching Employees & Departments</li>
+                        <li><span class="font-semibold text-slate-705">Alert Boost:</span> +10 for assigned alerts, +5 for unassigned</li>
+                        <li><span class="font-semibold text-slate-705">Forecast Boost:</span> Predictions Count >= 2 (+10), else +5</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    }
+</div>

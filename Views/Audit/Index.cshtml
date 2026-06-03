@@ -1,0 +1,269 @@
+@model List<IntelliOps.Models.AuditLog>
+@{
+    ViewData["Title"] = "Enterprise Activity Audit Ledger";
+    var activeFilter = ViewBag.ActiveFilter as string ?? "all";
+    var searchQuery = ViewBag.SearchQuery as string ?? "";
+}
+
+<div class="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+
+    <!-- Top Informational Banner / Intro Card -->
+    <div class="bento-card p-6 bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="max-w-3xl">
+            <h2 class="text-lg font-bold text-gray-900 tracking-tight flex items-center gap-2">
+                <i class="lucide-shield-alert text-emerald-500 w-5 h-5"></i>
+                Enterprise Activity Audit Ledger
+            </h2>
+            <p class="text-xs text-gray-500 mt-1 leading-relaxed">
+                Immutable system event log recording security actions, telemetry intake, database connections, manually scheduled operations, and model recalculations. Fully compliant with corporate SOC2 Type II operational record persistence.
+            </p>
+        </div>
+        
+        <div class="flex items-center gap-3 shrink-0">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Logging Hub: Active
+            </span>
+        </div>
+    </div>
+
+    <!-- KPI Metrics Panel -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <!-- Card 1: Total Events -->
+        <div class="bento-card p-4 bg-white flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-700">
+                <i data-lucide="database" class="w-5 h-5 text-slate-500"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono">Total Events</p>
+                <p class="text-xl font-bold text-slate-800 leading-tight">@ViewBag.KpiTotalEvents</p>
+            </div>
+        </div>
+
+        <!-- Card 2: CSV Imports -->
+        <div class="bento-card p-4 bg-white flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
+                <i data-lucide="file-spreadsheet" class="w-5 h-5 text-indigo-500"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono">CSV Imports</p>
+                <p class="text-xl font-bold text-slate-800 leading-tight">@ViewBag.KpiCsvUploads</p>
+            </div>
+        </div>
+
+        <!-- Card 3: Mitigations -->
+        <div class="bento-card p-4 bg-white flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <i data-lucide="shield-check" class="w-5 h-5 text-emerald-500"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono">Mitigations</p>
+                <p class="text-xl font-bold text-slate-800 leading-tight">@ViewBag.KpiMitigations</p>
+            </div>
+        </div>
+
+        <!-- Card 4: Alert Transitions -->
+        <div class="bento-card p-4 bg-white flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-600">
+                <i data-lucide="bell-ring" class="w-5 h-5 text-red-500"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono">Alert Actions</p>
+                <p class="text-xl font-bold text-slate-800 leading-tight">@ViewBag.KpiAlertTransitions</p>
+            </div>
+        </div>
+
+        <!-- Card 5: Risk Recalculations -->
+        <div class="bento-card p-4 bg-white flex items-center gap-3 col-span-2 md:col-span-1">
+            <div class="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center text-amber-600">
+                <i data-lucide="cpu" class="w-5 h-5 text-amber-500"></i>
+            </div>
+            <div>
+                <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider font-mono">Risk Recalcs</p>
+                <p class="text-xl font-bold text-slate-800 leading-tight">@ViewBag.KpiRiskRecalcs</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tab Controls & Text Search Index -->
+    <div class="bento-card p-4 bg-white border border-slate-200 rounded-xl space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            
+            <!-- 7 Filter Tabs -->
+            <div class="flex flex-wrap gap-1 border-b border-gray-100 lg:border-none pb-3 lg:pb-0">
+                <a href="/Audit?filter=all&search=@searchQuery" 
+                   class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all @(activeFilter == "all" ? "bg-slate-900 text-white font-bold" : "text-slate-600 hover:text-gray-900 hover:bg-slate-100")">
+                    All Events
+                </a>
+                <a href="/Audit?filter=today&search=@searchQuery" 
+                   class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all @(activeFilter == "today" ? "bg-slate-900 text-white font-bold" : "text-slate-600 hover:text-gray-900 hover:bg-slate-100")">
+                    Today
+                </a>
+                <a href="/Audit?filter=csv&search=@searchQuery" 
+                   class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all @(activeFilter == "csv" ? "bg-slate-900 text-white font-bold" : "text-slate-600 hover:text-gray-900 hover:bg-slate-100")">
+                    CSV Uploads
+                </a>
+                <a href="/Audit?filter=mitigations&search=@searchQuery" 
+                   class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all @(activeFilter == "mitigations" ? "bg-slate-900 text-white font-bold" : "text-slate-600 hover:text-gray-900 hover:bg-slate-100")">
+                    Mitigations
+                </a>
+                <a href="/Audit?filter=alerts&search=@searchQuery" 
+                   class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all @(activeFilter == "alerts" ? "bg-slate-900 text-white font-bold" : "text-slate-600 hover:text-gray-900 hover:bg-slate-100")">
+                    Alert Actions
+                </a>
+                <a href="/Audit?filter=predictions&search=@searchQuery" 
+                   class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all @(activeFilter == "predictions" ? "bg-slate-900 text-white font-bold" : "text-slate-600 hover:text-gray-900 hover:bg-slate-100")">
+                    Predictions
+                </a>
+                <a href="/Audit?filter=connectors&search=@searchQuery" 
+                   class="px-3 py-1.5 rounded-md text-xs font-semibold transition-all @(activeFilter == "connectors" ? "bg-slate-900 text-white font-bold" : "text-slate-600 hover:text-gray-900 hover:bg-slate-100")">
+                    Connectors
+                </a>
+            </div>
+
+            <!-- Global Search Form Input -->
+            <form action="/Audit" method="get" class="flex items-center gap-2 w-full lg:w-96">
+                <input type="hidden" name="filter" value="@activeFilter" />
+                <div class="relative w-full">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                    </span>
+                    <input type="text" name="search" value="@searchQuery" placeholder="Search actor, role, message..." 
+                           style="padding-left: 2.5rem !important;"
+                           class="w-full pr-4 py-1.5 text-xs rounded-md border border-slate-350 focus:outline-none focus:border-cyan-500" />
+                    @if (!string.IsNullOrEmpty(searchQuery))
+                    {
+                        <a href="/Audit?filter=@activeFilter" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-650">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </a>
+                    }
+                </div>
+                <button type="submit" class="btn btn-primary text-xs font-bold px-4 py-1.5 rounded h-full shadow-sm">
+                    Search
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Audit Event Table Container -->
+    <div class="bento-card bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-100">
+                <thead class="bg-slate-50 font-mono text-[10px] text-slate-450 uppercase font-bold">
+                    <tr>
+                        <th class="px-6 py-3.5 text-left font-semibold tracking-wider">Timestamp</th>
+                        <th class="px-6 py-3.5 text-left font-semibold tracking-wider">Operator / Actor</th>
+                        <th class="px-6 py-3.5 text-left font-semibold tracking-wider">Operational Role</th>
+                        <th class="px-6 py-3.5 text-left font-semibold tracking-wider">Action Identifier</th>
+                        <th class="px-6 py-3.5 text-left font-semibold tracking-wider">Event Details Description</th>
+                        <th class="px-6 py-3.5 text-center font-semibold tracking-wider">Impact level</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-xs text-slate-650">
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var log in Model)
+                        {
+                            var detailsLower = log.Details.ToLower();
+                            var isCritical = detailsLower.Contains("critical") || detailsLower.Contains("breached") || detailsLower.Contains("failed");
+                            var isHigh = detailsLower.Contains("high") || detailsLower.Contains("reallocated") || detailsLower.Contains("completed");
+                            var isModerate = detailsLower.Contains("recalculated") || detailsLower.Contains("transitioned") || log.Action == "ALERT_UPDATE" || log.Action == "RECOMMENDATION_STATUS_UPDATE";
+
+                            string impactBadgeClass = "bg-slate-50 text-slate-600 border-slate-200";
+                            string impactText = "Low / Info";
+
+                            if (isCritical)
+                            {
+                                impactBadgeClass = "bg-red-50 text-red-700 border-red-200 animate-pulse font-extrabold";
+                                impactText = "Critical";
+                            }
+                            else if (isHigh)
+                            {
+                                impactBadgeClass = "bg-amber-50 text-amber-700 border-amber-200 font-bold";
+                                impactText = "High";
+                            }
+                            else if (isModerate)
+                            {
+                                impactBadgeClass = "bg-blue-50 text-blue-700 border-blue-200 font-medium";
+                                impactText = "Moderate";
+                            }
+
+                            // Role specific stylings
+                            string roleClass = "bg-slate-100 text-slate-700";
+                            if (log.Role == "Director") roleClass = "bg-purple-100 text-purple-800 font-bold border border-purple-200";
+                            else if (log.Role == "Operations Manager") roleClass = "bg-cyan-100 text-cyan-800 font-bold border border-cyan-200";
+                            else if (log.Role == "Team Lead") roleClass = "bg-emerald-100 text-emerald-800 font-bold border border-emerald-250";
+
+                            // Action visual badges
+                            string actionClass = "bg-slate-100 text-slate-700 border-slate-200";
+                            if (log.Action == "CSV_UPLOAD") actionClass = "bg-indigo-50 text-indigo-700 border-indigo-200";
+                            else if (log.Action == "MANUAL_ENTRY") actionClass = "bg-teal-50 text-teal-700 border-teal-200";
+                            else if (log.Action == "ALERT_UPDATE" || log.Action == "SLA_RESOLVED") actionClass = "bg-rose-50 text-rose-700 border-rose-200";
+                            else if (log.Action == "RECOMMENDATION_STATUS_UPDATE" || log.Action == "RECOMMENDATION_EXECUTE") actionClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                            else if (log.Action == "SAP_SYNC") actionClass = "bg-amber-50 text-amber-800 border-amber-200";
+                            else if (log.Action == "GET_RISK_FORECAST") actionClass = "bg-sky-50 text-sky-700 border-sky-200";
+
+                            <tr class="hover:bg-slate-50/70 transition-all font-sans">
+                                <!-- Timestamp in Monospace -->
+                                <td class="px-6 py-4 whitespace-nowrap font-mono text-[11px] text-slate-500">
+                                    @log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")
+                                    <span class="text-[9px] text-slate-400 block mt-0.5">UTC</span>
+                                </td>
+
+                                <!-- User Name/Email -->
+                                <td class="px-6 py-4 whitespace-nowrap font-semibold text-slate-800">
+                                    @log.User
+                                </td>
+
+                                <!-- Role Badge -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2.5 py-0.5 rounded text-[10px] uppercase font-mono @roleClass shadow-sm inline-block">
+                                        @log.Role
+                                    </span>
+                                </td>
+
+                                <!-- Action Category Badge -->
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-mono border uppercase tracking-tight @actionClass inline-block">
+                                        @log.Action
+                                    </span>
+                                </td>
+
+                                <!-- Details -->
+                                <td class="px-6 py-4 leading-relaxed max-w-sm xl:max-w-md truncate-hover font-medium text-slate-705">
+                                    @log.Details
+                                </td>
+
+                                <!-- Severity Impact Badge -->
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] uppercase font-mono border @impactBadgeClass inline-block shadow-inner">
+                                        @impactText
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="px-6 py-12 text-center text-slate-450 bg-slate-50/30">
+                                <div class="flex flex-col items-center justify-center space-y-2">
+                                    <i data-lucide="inbox" class="w-8 h-8 text-slate-350"></i>
+                                    <span class="font-medium text-slate-400 text-xs">No corporate audit event trails match the active filtration query.</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+    });
+</script>

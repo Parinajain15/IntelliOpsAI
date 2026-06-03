@@ -1,0 +1,167 @@
+@{
+    ViewData["Title"] = "CSV Bulk Ingestion Pipe";
+}
+
+<div class="max-w-4xl mx-auto space-y-8">
+    
+    <!-- Upload Area Header -->
+    <div class="bento-card p-6">
+        <h3 class="font-bold text-gray-900 text-sm mb-2">Ingest Bulk Operational Telemetry</h3>
+        <p class="text-xs text-gray-500 mb-6 leading-relaxed">
+            Upload enterprise logs directly to register operational task records in bulk. 
+            All uploads run validation checks, verify duplicate identifier checks, and log actions to the security audit trails.
+        </p>
+
+        <!-- Dynamic Logs and Errors summary -->
+        @if (TempData["Logs"] != null)
+        {
+            <div class="mb-6 bg-slate-900 border border-slate-800 rounded-lg p-4 text-slate-300 font-mono text-[11px] h-48 overflow-y-auto">
+                <span class="text-cyan-400 font-semibold uppercase tracking-wider block border-b border-slate-800 pb-1.5 mb-2">[ PROCESSING COMPILING REPORT ]</span>
+                <pre class="whitespace-pre-wrap select-text">@TempData["Logs"]</pre>
+            </div>
+        }
+
+        <!-- Interactive Drag-And-Drop Upload Form Layout -->
+        <form action="/Upload/Import" method="post" enctype="multipart/form-data" class="space-y-4" id="upload-form">
+            <div class="border-2 border-dashed border-gray-200 hover:border-cyan-500 rounded-xl px-8 py-12 flex flex-col items-center justify-center text-center cursor-pointer transition-colors bg-gray-50/50" id="drop-zone">
+                <i class="lucide-upload-cloud text-gray-400 text-3xl mb-4" id="upload-icon"></i>
+                <h4 class="text-xs text-gray-700 font-bold mb-1">Drag and drop your spreadsheet here</h4>
+                <p class="text-[10px] text-gray-400 mb-4">Supported extensions: .csv only (Maximum 10MB)</p>
+                
+                <input type="file" name="file" id="file-input" class="hidden" accept=".csv" />
+                <button type="button" onclick="document.getElementById('file-input').click()" class="btn btn-secondary text-xs px-4 py-2">
+                    Browse File Storage
+                </button>
+            </div>
+            
+            <div id="file-selected-indicator" class="hidden bg-slate-100/85 border border-slate-200 rounded-lg px-4 py-2.5 flex items-center justify-between text-xs text-slate-700">
+                <div class="flex items-center gap-2">
+                    <i class="lucide-file-text text-cyan-600 text-sm"></i>
+                    <span id="file-name" class="font-bold font-mono text-gray-800">No file selected</span>
+                </div>
+                <button type="submit" class="btn btn-primary text-xs px-4 py-1.5">
+                    Execute Bulk Import
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Spreadsheet Column Standard template instruction card -->
+    <div class="bento-card p-6">
+        <h4 class="text-xs font-bold text-gray-900 mb-3 uppercase tracking-wider">Required Schema Format</h4>
+        <p class="text-xs text-slate-500 mb-4 leading-relaxed">
+            Ensure your comma-separated spreadsheet matches the standard CSV format columns detailed below:
+        </p>
+        <div class="bg-slate-55 border border-slate-200 rounded-lg p-3 overflow-x-auto">
+            <code class="text-[10px] text-slate-700 font-mono leading-relaxed block select-all">
+                EmployeeName,Department,Priority,Notes,Status,HoursWorked,SlaBreached<br />
+                Marcus Vance,Engineering,High,SAP MM gateway check,Pending,12,false<br />
+                Hiroshi Tanaka,Quality Assurance,Critical,Stress-test REST API endpoints,In Progress,20,true
+            </code>
+        </div>
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 text-[10px] text-slate-500 font-medium border-t border-gray-100 pt-4">
+            <div>
+                <strong class="text-gray-900">EmployeeName</strong>
+                <p class="mt-0.5">Assigned staff name</p>
+            </div>
+            <div>
+                <strong class="text-gray-900 font-semibold">Department</strong>
+                <p class="mt-0.5">Engineering, Supply Chain, QA, etc.</p>
+            </div>
+            <div>
+                <strong class="text-gray-900">Priority</strong>
+                <p class="mt-0.5">Low, Medium, High, Critical</p>
+            </div>
+            <div>
+                <strong class="text-gray-900">SlaBreached</strong>
+                <p class="mt-0.5">true or false (optional)</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CSV Ingest Logs History -->
+    <div class="bento-card overflow-hidden flex flex-col">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-gray-900">Spreadsheet Ingestion Audit Records</h3>
+            <span class="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-semibold border border-emerald-100">Auto Audited</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-gray-700">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200">
+                        <th class="px-6 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Timestamp (UTC)</th>
+                        <th class="px-6 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Action Type</th>
+                        <th class="px-6 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Assigned User</th>
+                        <th class="px-6 py-3 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Operation Details</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @if (ViewBag.UploadAudits != null && ((List<IntelliOps.Models.AuditLog>)ViewBag.UploadAudits).Any())
+                    {
+                        foreach (var log in (List<IntelliOps.Models.AuditLog>)ViewBag.UploadAudits)
+                        {
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="px-6 py-3.5 font-mono text-[11px] text-gray-400">@log.Timestamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                <td class="px-6 py-3.5"><span class="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-700 font-mono text-[9px] font-semibold">@log.Action</span></td>
+                                <td class="px-6 py-3.5 text-gray-900 font-semibold">@log.User (@log.Role)</td>
+                                <td class="px-6 py-3.5 text-gray-500 text-[11px]">@log.Details</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-400 text-xs">No spreadsheets uploaded inside current DB shift yet.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Drag & Drop script bindings -->
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const dropZone = document.getElementById("drop-zone");
+        const fileInput = document.getElementById("file-input");
+        const indicator = document.getElementById("file-selected-indicator");
+        const fileNameDisp = document.getElementById("file-name");
+        const uploadIcon = document.getElementById("upload-icon");
+
+        // Dragover event styling
+        dropZone.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            dropZone.classList.add("border-cyan-500", "bg-cyan-500/5");
+        });
+
+        ["dragleave", "dragend"].forEach(type => {
+            dropZone.addEventListener(type, () => {
+                dropZone.classList.remove("border-cyan-500", "bg-cyan-500/5");
+            });
+        });
+
+        dropZone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            dropZone.classList.remove("border-cyan-500", "bg-cyan-500/5");
+            
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelected(fileInput.files[0]);
+            }
+        });
+
+        fileInput.addEventListener("change", () => {
+            if (fileInput.files.length) {
+                handleFileSelected(fileInput.files[0]);
+            }
+        });
+
+        function handleFileSelected(file) {
+            fileNameDisp.textContent = `${file.name} (${Math.round(file.size / 102.4) / 10} KB)`;
+            indicator.classList.remove("hidden");
+            uploadIcon.classList.remove("text-gray-400");
+            uploadIcon.classList.add("text-cyan-500");
+        }
+    });
+</script>

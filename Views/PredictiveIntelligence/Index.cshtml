@@ -1,0 +1,772 @@
+@model IntelliOps.Models.PredictiveIntelligenceViewModel
+@{
+    ViewData["Title"] = "Risk Forecast Engine";
+}
+
+<!-- Title and Navigation Header bar -->
+<div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 pb-5">
+    <div>
+        <h2 class="text-2xl font-extrabold text-navy-900 tracking-tight font-sans">Predictive Risk Forecast Engine</h2>
+        <p class="text-xs text-gray-500 mt-1 leading-normal">
+            7-Day Ahead system projection computed from operational logs, active alert density, work overtime fatigue, and SLA velocity parameters.
+        </p>
+    </div>
+
+    <!-- Active status block -->
+    <div class="flex items-center gap-2.5 bg-white border border-gray-200. shadow-sm px-4 py-2 rounded-lg select-none">
+        <span class="relative flex h-2.5 w-2.5">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+        </span>
+        <div class="text-left leading-none">
+            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Analytical State</span>
+            <span class="text-xs font-semibold text-emerald-600">Continuous Sync Live</span>
+        </div>
+    </div>
+</div>
+
+<!-- 1. Executive Prediction Summary Widget -->
+<div class="bento-card p-6 mb-8 border-l-4 @(Model.ExecutiveSummary.OverallTrend == "Deteriorating" ? "border-l-red-500 bg-red-50/10" : Model.ExecutiveSummary.OverallTrend == "Improving" ? "border-l-emerald-500 bg-emerald-50/10" : "border-l-cyan-500 bg-cyan-50/5") shadow-md rounded-xl">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4 pb-3 border-b border-gray-100/60">
+        <div class="flex items-center gap-3">
+            <span class="p-2.5 rounded-lg @(Model.ExecutiveSummary.OverallTrend == "Deteriorating" ? "bg-red-50 text-red-600" : Model.ExecutiveSummary.OverallTrend == "Improving" ? "bg-emerald-50 text-emerald-600" : "bg-cyan-50 text-cyan-600")">
+                <i data-lucide="shield-alert" class="w-5 h-5"></i>
+            </span>
+            <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block font-mono">Executive Strategic Briefing</span>
+                <h3 class="text-md font-bold text-gray-900 tracking-tight leading-tight">@Model.ExecutiveSummary.Headline</h3>
+            </div>
+        </div>
+
+        <div class="shrink-0">
+            <span class="px-3.5 py-1.5 rounded-full text-xs font-bold tracking-tight inline-flex items-center gap-1.5
+                @(Model.ExecutiveSummary.OverallTrend == "Deteriorating" ? "bg-red-100/70 text-red-700 border border-red-300/40" :
+                  Model.ExecutiveSummary.OverallTrend == "Improving" ? "bg-emerald-100/70 text-emerald-700 border border-emerald-300/40" :
+                  "bg-cyan-100/70 text-cyan-750 border border-cyan-300/40")">
+                <span class="w-2 h-2 rounded-full @(Model.ExecutiveSummary.OverallTrend == "Deteriorating" ? "bg-red-500" : Model.ExecutiveSummary.OverallTrend == "Improving" ? "bg-emerald-500" : "bg-cyan-500") animate-pulse"></span>
+                Trend Profile: @Model.ExecutiveSummary.OverallTrend
+            </span>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Text Narrative -->
+        <div class="lg:col-span-2">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Operational Narrative</h4>
+            <p class="text-xs text-gray-700 leading-relaxed font-sans">
+                @Model.ExecutiveSummary.Narrative
+            </p>
+            <div class="mt-4 flex items-center gap-4 text-xs font-medium text-gray-500 bg-gray-50 px-3.5 py-2 rounded-lg border border-gray-150 w-fit">
+                <span class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    <strong class="font-bold text-slate-900 font-mono">@Model.ExecutiveSummary.CriticalRiskCount</strong> Critical Areas
+                </span>
+                <span class="flex items-center gap-1.5 border-l border-gray-300 pl-4">
+                    <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+                    <strong class="font-bold text-slate-900 font-mono">@Model.ExecutiveSummary.HighRiskCount</strong> Elevated Vulnerabilities
+                </span>
+            </div>
+        </div>
+
+        <!-- Preventative Tactics -->
+        <div class="bg-gray-50/50 p-4 rounded-lg border border-gray-100">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5 flex items-center gap-1.5">
+                <i data-lucide="shield-check" class="w-4 h-4 text-emerald-600"></i>
+                Strategic Mitigation Plan
+            </h4>
+            <div class="space-y-3">
+                @foreach (var line in Model.ExecutiveSummary.KeyStrategicTactics.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                {
+                    <div class="flex items-start gap-2 text-xs">
+                        <span class="text-emerald-600 mt-0.5 font-bold">•</span>
+                        <p class="text-gray-700 leading-normal">@line.TrimStart('-', ' ')</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Forecast Summary Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    
+    <!-- Department Risk Summary Card -->
+    <div class="bento-card p-5 flex flex-col justify-between hover:shadow-md transition-all duration-250">
+        <div class="flex items-center justify-between text-gray-500 mb-3">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Department Risk</span>
+            <i data-lucide="layers" class="w-4 h-4 text-cyan-500"></i>
+        </div>
+        <div>
+            <div class="flex items-baseline gap-1.5">
+                <span class="text-3xl font-extrabold text-slate-900 tracking-tight font-mono">
+                    @(Model.DepartmentForecasts.Any() ? (int)Math.Round(Model.DepartmentForecasts.Average(d => d.Probability)) : 0)%
+                </span>
+                <span class="text-xs text-gray-400">Avg Risk</span>
+            </div>
+            
+            <span class="mt-2.5 inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-bold tracking-tight uppercase font-mono
+                @(Model.DepartmentForecasts.Any(d => d.RiskLevel == "Critical") ? "bg-red-50 text-red-700 border border-red-150" :
+                  Model.DepartmentForecasts.Any(d => d.RiskLevel == "High") ? "bg-orange-50 text-orange-700 border border-orange-150" :
+                  "bg-emerald-50 text-emerald-700 border border-emerald-150")">
+                @(Model.DepartmentForecasts.Count(d => d.RiskLevel == "Critical" || d.RiskLevel == "High")) High-load Units
+            </span>
+        </div>
+        <p class="text-[10px] text-gray-400 mt-4 leading-normal border-t border-gray-50 pt-2.5">
+            Refined 7d forecast using workload scores and unmitigated active alert backlogs.
+        </p>
+    </div>
+
+    <!-- Employee Burnout Summary Card -->
+    <div class="bento-card p-5 flex flex-col justify-between hover:shadow-md transition-all duration-250">
+        <div class="flex items-center justify-between text-gray-500 mb-3">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Workforce Burnout</span>
+            <i data-lucide="flame" class="w-4 h-4 text-orange-500"></i>
+        </div>
+        <div>
+            <div class="flex items-baseline gap-1.5">
+                <span class="text-3xl font-extrabold text-slate-900 tracking-tight font-mono">
+                    @(Model.EmployeeForecasts.Any() ? (int)Math.Round(Model.EmployeeForecasts.Average(e => e.Probability)) : 0)%
+                </span>
+                <span class="text-xs text-gray-400">Mean Fatigue</span>
+            </div>
+
+            <span class="mt-2.5 inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-bold tracking-tight uppercase font-mono
+                @(Model.EmployeeForecasts.Count(e => e.HoursWorked > 42) > 0 ? "bg-amber-50 text-amber-700 border border-amber-150" : "bg-emerald-50 text-emerald-700 border border-emerald-150")">
+                @Model.EmployeeForecasts.Count(e => e.HoursWorked > 42) Logging Overtime
+            </span>
+        </div>
+        <p class="text-[10px] text-gray-400 mt-4 leading-normal border-t border-gray-50 pt-2.5">
+            Based on active multitasking assignments and total hours worked per individual.
+        </p>
+    </div>
+
+    <!-- SLA Failure Summary Card -->
+    <div class="bento-card p-5 flex flex-col justify-between hover:shadow-md transition-all duration-250">
+        <div class="flex items-center justify-between text-gray-500 mb-3">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">SLA Failure Risk</span>
+            <i data-lucide="clock" class="w-4 h-4 text-red-500"></i>
+        </div>
+        <div>
+            <div class="flex items-baseline gap-1.5">
+                <span class="text-3xl font-extrabold text-slate-900 tracking-tight font-mono">
+                    @(Model.SlaForecasts.Any() ? (int)Math.Round(Model.SlaForecasts.Average(s => s.Probability)) : 0)%
+                </span>
+                <span class="text-xs text-gray-400">Avg Breach Ch</span>
+            </div>
+
+            <span class="mt-2.5 inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-bold tracking-tight uppercase font-mono
+                @(Model.SlaForecasts.Any(s => s.SlaBreaches > 0) ? "bg-red-50 text-red-700 border border-red-150" : "bg-emerald-50 text-emerald-700 border border-emerald-150")">
+                @(Model.SlaForecasts.Sum(s => s.SlaBreaches)) Pending Breaches
+            </span>
+        </div>
+        <p class="text-[10px] text-gray-400 mt-4 leading-normal border-t border-gray-50 pt-2.5">
+            Projections reflecting high priority task congestions and overdue items.
+        </p>
+    </div>
+
+    <!-- Delivery Delay Summary Card -->
+    <div class="bento-card p-5 flex flex-col justify-between hover:shadow-md transition-all duration-250">
+        <div class="flex items-center justify-between text-gray-500 mb-3">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">Delivery Delay</span>
+            <i data-lucide="hourglass" class="w-4 h-4 text-indigo-500"></i>
+        </div>
+        <div>
+            <div class="flex items-baseline gap-1.5">
+                <span class="text-3xl font-extrabold text-slate-900 tracking-tight font-mono">
+                    @(Model.DeliveryForecasts.Any() ? (int)Math.Round(Model.DeliveryForecasts.Average(d => d.Probability)) : 0)%
+                </span>
+                <span class="text-xs text-gray-400">Delay Prob</span>
+            </div>
+
+            <span class="mt-2.5 inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-bold tracking-tight uppercase font-mono
+                @(Model.DeliveryForecasts.Sum(d => d.LongRunningTaskCount) > 0 ? "bg-amber-50 text-amber-700 border border-amber-150" : "bg-emerald-50 text-emerald-700 border border-emerald-150")">
+                @(Model.DeliveryForecasts.Sum(d => d.LongRunningTaskCount)) Aged Tasks (>25h)
+            </span>
+        </div>
+        <p class="text-[10px] text-gray-400 mt-4 leading-normal border-t border-gray-50 pt-2.5">
+            Assesses backlog hours volume and long-running items awaiting completion.
+        </p>
+    </div>
+</div>
+
+<!-- 3. Chart and Top 5 Risks Multi-Column Container -->
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-8 mb-8">
+    
+    <!-- Left: 7-Day Trend Chart (3/5 width span) -->
+    <div class="lg:col-span-3 bento-card p-6 flex flex-col justify-between h-full shadow-sm rounded-xl">
+        <div class="mb-4">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-widest text-slate-500 font-mono block">Predictive Trend Workspace</span>
+                <span class="text-[9px] bg-gray-100 hover:bg-gray-200. border border-gray-200 text-gray-500 px-2 py-0.5 rounded font-mono font-bold cursor-pointer select-none">
+                    Next 7 Days Projected
+                </span>
+            </div>
+            <h3 class="text-md font-bold text-gray-900 mt-0.5 tracking-tight">Projected Multi-Index Risk Trend</h3>
+            <p class="text-[10px] text-gray-400 mt-0.5 leading-normal">
+                Visualizing daily trend lines adjusted dynamically by current workforce overtime and unmitigated incidents.
+            </p>
+        </div>
+
+        <div class="w-full relative py-1 h-[330px] flex flex-col justify-center items-center">
+            @if (Model.ProjectedRiskTrend == null || !Model.ProjectedRiskTrend.Any())
+            {
+                <div id="chartFallback" class="flex flex-col items-center justify-center text-center p-8 text-slate-500 space-y-3">
+                    <div class="w-10 h-10 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p class="text-sm font-semibold text-slate-700 animate-pulse">Generating projection model...</p>
+                    <p class="text-xs text-slate-400">Please wait while the system recalibrates the metric feeds.</p>
+                </div>
+            }
+            else
+            {
+                <div class="w-full h-full">
+                    <canvas id="projectLocationTrendChart" style="display: block; box-sizing: border-box; height: 100%; width: 100%;"></canvas>
+                </div>
+            }
+        </div>
+
+        <!-- Dynamic Chart Legends block -->
+        <div class="mt-2 pt-3 border-t border-gray-100 flex flex-wrap justify-between items-center gap-3">
+            <p class="text-[10px] text-gray-400 font-medium">
+                * Note: Click on a legend label in the chart to toggle individual trend visibility.
+            </p>
+            <p class="text-[9px] text-gray-400 text-right font-mono leading-none">
+                Risk Engine Synced: @DateTime.UtcNow.ToString("dd MMM yyyy HH:mm") UTC
+            </p>
+        </div>
+    </div>
+
+    <!-- Right: Top 5 Future Risks (2/5 width span) -->
+    <div class="lg:col-span-2 bento-card p-6 flex flex-col justify-between h-full shadow-sm rounded-xl">
+        <div>
+            <span class="text-xs font-bold uppercase tracking-widest text-slate-500 font-mono block">Threat Matrix</span>
+            <h3 class="text-md font-bold text-gray-900 mt-0.5 tracking-tight">Top 5 Forecasted Threats</h3>
+            <p class="text-[10px] text-gray-400 mt-0.5 leading-normal">
+                Next-week items sorted by highest risk probability. Corrective intervention has maximum impact here.
+            </p>
+        </div>
+
+        <div class="my-5 divide-y divide-gray-100 flex-1 overflow-y-auto pr-1">
+            @if (Model.TopFutureRisks.Any())
+            {
+                @for (int idx = 0; idx < Model.TopFutureRisks.Count; idx++)
+                {
+                    var r = Model.TopFutureRisks[idx];
+                    <div class="py-3 @(idx == 0 ? "pt-2" : "") @(idx == 4 ? "pb-2" : "")">
+                        <div class="flex justify-between items-start gap-2.5">
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-xs font-extrabold text-slate-900 tracking-tight leading-none">
+                                        @r.Target
+                                    </span>
+                                    <span class="text-[9px] text-gray-400 px-1.5 py-0.5 bg-gray-100 rounded border border-gray-150 font-semibold uppercase tracking-wider font-mono">
+                                        @r.Type
+                                    </span>
+                                </div>
+                                <p class="text-[10.5px] text-gray-500 mt-1 leading-relaxed line-clamp-2">
+                                    @r.Description
+                                </p>
+                            </div>
+                            
+                            <div class="text-right shrink-0 flex flex-col items-end gap-1 font-mono">
+                                <span class="px-2 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase leading-none border
+                                    @(r.RiskLevel == "Critical" ? "bg-red-50 text-red-700 border-red-200" :
+                                      r.RiskLevel == "High" ? "bg-orange-50 text-orange-700 border-orange-200" :
+                                      r.RiskLevel == "Medium" ? "bg-yellow-50 text-yellow-800 border-yellow-200" :
+                                      "bg-emerald-55 text-emerald-700 border-emerald-200")">
+                                    @r.RiskLevel
+                                </span>
+                                <span class="text-xs font-bold text-slate-800 tracking-tighter block mt-0.5 font-mono">
+                                    @r.Probability% Prob
+                                </span>
+                                <span class="text-[9px] text-gray-400 font-mono tracking-tight font-medium">
+                                    Impact: D+@r.DaysUntilImpact
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Mini progress bar -->
+                        <div class="w-full bg-gray-100 h-1 rounded-full mt-2.5 overflow-hidden">
+                            <div class="h-full rounded-full 
+                                @(r.RiskLevel == "Critical" ? "bg-red-500" :
+                                  r.RiskLevel == "High" ? "bg-orange-500" :
+                                  r.RiskLevel == "Medium" ? "bg-yellow-500" :
+                                  "bg-emerald-500")"
+                                 style="width: @(r.Probability)%"></div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="flex flex-col items-center justify-center h-full text-center text-gray-400 py-10">
+                    <i data-lucide="shield" class="w-8 h-8 text-slate-300 mb-2"></i>
+                    <p class="text-xs">No imminent future risks detected at this time.</p>
+                </div>
+            }
+        </div>
+
+        <div class="bg-gray-50 p-3.5 rounded-lg border border-gray-150 text-[10px] leading-relaxed">
+            <span class="font-bold text-slate-800 block uppercase tracking-wider font-mono text-[9px] mb-1 flex items-center gap-1">
+                <i data-lucide="info" class="w-3 h-3 text-cyan-600"></i>
+                Risk Matrix Explanation
+            </span>
+            Probability calculations are compiled using structural coefficients. Address critical risk nodes under mitigation views before Day +3 to interrupt upcoming failure feedback cascades.
+        </div>
+    </div>
+</div>
+
+<!-- 4. Tab Segment: Detailed Forecast Feeds -->
+<div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-12">
+    <!-- Header Controls and Tabs -->
+    <div class="px-6 py-4 border-b border-gray-150 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gray-50/50">
+        <div>
+            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-widest font-mono">Detailed Projection Matrices</h3>
+            <p class="text-[10px] text-gray-400 mt-0.5 leading-none">Select tabs below to investigate department load indices and burnout vulnerabilities.</p>
+        </div>
+
+        <!-- Buttons for tabs selection -->
+        <div class="flex flex-wrap gap-1.5 bg-gray-100 p-1 rounded-lg border border-gray-200/60 text-xs font-semibold select-none shadow-inner select-none font-mono">
+            <button onclick="switchTab('tab-depts')" id="btn-tab-depts" class="px-3.5 py-1.5 rounded-md text-slate-800 bg-white shadow-sm font-bold transition-all hover:text-slate-900 cursor-pointer">
+                1. Department Loads
+            </button>
+            <button onclick="switchTab('tab-staff')" id="btn-tab-staff" class="px-3.5 py-1.5 rounded-md text-slate-500 hover:text-slate-850 font-medium transition-all cursor-pointer">
+                2. Employee Burnout
+            </button>
+            <button onclick="switchTab('tab-sla')" id="btn-tab-sla" class="px-3.5 py-1.5 rounded-md text-slate-500 hover:text-slate-850 font-medium transition-all cursor-pointer">
+                3. SLA Failures
+            </button>
+            <button onclick="switchTab('tab-delay')" id="btn-tab-delay" class="px-3.5 py-1.5 rounded-md text-slate-500 hover:text-slate-850 font-medium transition-all cursor-pointer">
+                4. Delivery Delays
+            </button>
+        </div>
+    </div>
+
+    <!-- Active views area -->
+    <div class="p-6">
+        
+        <!-- Tab 1: Department Risk Matrix -->
+        <div id="tab-depts" class="active-tab-container block">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-200. text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+                            <th class="pb-3 pr-4">Department Unit</th>
+                            <th class="pb-3 px-4">Risk Level</th>
+                            <th class="pb-3 px-4 text-right">Failure Probability</th>
+                            <th class="pb-3 px-4 text-right">System Outages</th>
+                            <th class="pb-3 px-4 text-right">Workload score</th>
+                            <th class="pb-3 px-4 text-right">Average Hours</th>
+                            <th class="pb-3 pl-4">Primary Driver Indicator</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-xs">
+                        @foreach (var d in Model.DepartmentForecasts)
+                        {
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="py-3.5 pr-4 font-bold text-slate-900">@d.TargetName</td>
+                                <td class="py-3.5 px-4">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase font-mono border
+                                        @(d.RiskLevel == "Critical" ? "bg-red-50 text-red-700 border-red-200" :
+                                          d.RiskLevel == "High" ? "bg-orange-50 text-orange-700 border-orange-200" :
+                                          d.RiskLevel == "Medium" ? "bg-yellow-50 text-yellow-800 border-yellow-200" :
+                                          "bg-emerald-50 text-emerald-700 border-emerald-200")">
+                                        @d.RiskLevel
+                                    </span>
+                                </td>
+                                <td class="py-3.5 px-4 text-right font-bold font-mono">@d.Probability%</td>
+                                <td class="py-3.5 px-4 text-right font-semibold font-mono text-gray-500">@d.ActiveAlerts</td>
+                                <td class="py-3.5 px-4 text-right font-semibold font-mono text-gray-500">@d.WorkloadScore</td>
+                                <td class="py-3.5 px-4 text-right font-semibold font-mono text-gray-500">@d.AverageHours h/wk</td>
+                                <td class="py-3.5 pl-4 text-gray-600">
+                                    <div class="flex items-start gap-1.5 leading-normal">
+                                        <i data-lucide="info" class="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0"></i>
+                                        <span>@d.PrimaryDriver</span>
+                                    </div>
+                                    <p class="text-[10px] text-emerald-700 font-medium mt-1 leading-snug">
+                                        <strong class="font-bold">Rec Action:</strong> @d.RecommendedAction
+                                    </p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 2: Employee Burnout Risk Feed -->
+        <div id="tab-staff" class="active-tab-container hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-200. text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+                            <th class="pb-3 pr-4">Staff Member</th>
+                            <th class="pb-3 px-4">Department</th>
+                            <th class="pb-3 px-4">Overstrain Threat Level</th>
+                            <th class="pb-3 px-4 text-right">Probability Rate</th>
+                            <th class="pb-3 px-4 text-right">Hours Clocked</th>
+                            <th class="pb-3 px-4 text-right">In-flight Tasks</th>
+                            <th class="pb-3 pl-4">Fatigue Driver</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-xs">
+                        @foreach (var e in Model.EmployeeForecasts)
+                        {
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="py-3.5 pr-4 font-bold text-slate-900">@e.TargetName</td>
+                                <td class="py-3.5 px-4 text-gray-600 font-medium">@e.Department</td>
+                                <td class="py-3.5 px-4">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase font-mono border
+                                        @(e.RiskLevel == "Critical" ? "bg-red-50 text-red-700 border-red-200" :
+                                          e.RiskLevel == "High" ? "bg-orange-50 text-orange-700 border-orange-200" :
+                                          e.RiskLevel == "Medium" ? "bg-yellow-50 text-yellow-800 border-yellow-250" :
+                                          "bg-emerald-50 text-emerald-700 border-emerald-200")">
+                                        @e.RiskLevel
+                                    </span>
+                                </td>
+                                <td class="py-3.5 px-4 text-right font-bold font-mono">@e.Probability%</td>
+                                <td class="py-3.5 px-4 text-right font-semibold font-mono text-gray-500">@e.HoursWorked h</td>
+                                <td class="py-3.5 px-4 text-right font-semibold font-mono text-gray-500">@e.ActiveTasks</td>
+                                <td class="py-3.5 pl-4 text-gray-600">
+                                    <div class="flex items-start gap-1.5 leading-normal">
+                                        <i data-lucide="info" class="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0"></i>
+                                        <span>@e.PrimaryDriver</span>
+                                    </div>
+                                    <p class="text-[10px] text-amber-700 font-medium mt-1 leading-snug">
+                                        <strong class="font-bold">Mitigation Action:</strong> @e.RecommendedAction
+                                    </p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 3: SLA Failure Thresholds -->
+        <div id="tab-sla" class="active-tab-container hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-200. text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+                            <th class="pb-3 pr-4">Delivery Channel</th>
+                            <th class="pb-3 px-4">Expected Breach Intensity</th>
+                            <th class="pb-3 px-4 text-right">Failure Risk Probability</th>
+                            <th class="pb-3 px-4 text-right">In-flight Tasks Queue</th>
+                            <th class="pb-3 px-4 text-right">Current SLA Breaches</th>
+                            <th class="pb-3 pl-4">Failure Cascade Driver Tracker</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-xs">
+                        @foreach (var s in Model.SlaForecasts)
+                        {
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="py-3.5 pr-4 font-bold text-slate-900">@s.TargetName</td>
+                                <td class="py-3.5 px-4 block">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase font-mono border
+                                        @(s.RiskLevel == "Critical" ? "bg-red-50 text-red-700 border-red-200" :
+                                          s.RiskLevel == "High" ? "bg-orange-50 text-orange-700 border-orange-200" :
+                                          s.RiskLevel == "Medium" ? "bg-yellow-50 text-yellow-800 border-yellow-250" :
+                                          "bg-emerald-50 text-emerald-700 border-emerald-200")">
+                                        @s.RiskLevel
+                                    </span>
+                                </td>
+                                <td class="py-3.5 px-4 text-right font-bold font-mono">@s.Probability%</td>
+                                <td class="py-3.5 px-4 text-right font-semibold font-mono text-gray-500">@s.PendingTasks</td>
+                                <td class="py-3.5 px-4 text-right font-semibold font-mono text-gray-500">@s.SlaBreaches</td>
+                                <td class="py-3.5 pl-4 text-gray-600">
+                                    <div class="flex items-start gap-1.5 leading-normal">
+                                        <i data-lucide="info" class="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0"></i>
+                                        <span>@s.PrimaryDriver</span>
+                                    </div>
+                                    <p class="text-[10px] text-red-700 font-medium mt-1 leading-snug">
+                                        <strong class="font-bold">Corrective Action:</strong> @s.RecommendedAction
+                                    </p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Tab 4: Delivery Delay Workspace -->
+        <div id="tab-delay" class="active-tab-container hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-gray-200. text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+                            <th class="pb-3 pr-4">Delivery pipeline</th>
+                            <th class="pb-3 px-4">Calculated Delay Level</th>
+                            <th class="pb-3 px-4 text-right font-mono">Delay Risk Probability</th>
+                            <th class="pb-3 px-4 text-right font-mono">Active Backlog Volume</th>
+                            <th class="pb-3 px-4 text-right font-mono">Aged Tasks (>25h)</th>
+                            <th class="pb-3 pl-4">Backlog Congestion Driver</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100 text-xs">
+                        @foreach (var d in Model.DeliveryForecasts)
+                        {
+                            <tr class="hover:bg-slate-50/50 transition-colors">
+                                <td class="py-3.5 pr-4 font-bold text-slate-900 font-sans">@d.TargetName</td>
+                                <td class="py-3.5 px-4">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase font-mono border
+                                        @(d.RiskLevel == "Critical" ? "bg-red-50 text-red-700 border-red-200" :
+                                          d.RiskLevel == "High" ? "bg-orange-50 text-orange-700 border-orange-200" :
+                                          d.RiskLevel == "Medium" ? "bg-yellow-50 text-yellow-800 border-yellow-250" :
+                                          "bg-emerald-50 text-emerald-700 border-emerald-200")">
+                                        @d.RiskLevel
+                                    </span>
+                                </td>
+                                <td class="py-3.5 px-4 text-right font-bold font-mono">@d.Probability%</td>
+                                <td class="py-3.5 px-4 text-right font-semibold font-mono text-gray-500">@d.TotalActiveHours hours (@d.TaskCount tasks)</td>
+                                <td class="py-3.5 px-4 text-right font-semibold font-mono text-gray-500">@d.LongRunningTaskCount</td>
+                                <td class="py-3.5 pl-4 text-gray-600">
+                                    <div class="flex items-start gap-1.5 leading-normal">
+                                        <i data-lucide="info" class="w-3.5 h-3.5 text-gray-400 mt-0.5 shrink-0"></i>
+                                        <span>@d.PrimaryDriver</span>
+                                    </div>
+                                    <p class="text-[10px] text-indigo-700 font-medium mt-1 leading-snug">
+                                        <strong class="font-bold">Preventive Action:</strong> @d.RecommendedAction
+                                    </p>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // High fidelity Tab switcher script logic
+        function switchTab(tabId) {
+            // Get all tab container elements
+            const containers = document.querySelectorAll('.active-tab-container');
+            containers.forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+
+            // Make target tab block active
+            const activeEl = document.getElementById(tabId);
+            if (activeEl) {
+                activeEl.classList.add('block');
+                activeEl.classList.remove('hidden');
+            }
+
+            // Toggling tab focus classes
+            const tabs = ['tab-depts', 'tab-staff', 'tab-sla', 'tab-delay'];
+            tabs.forEach(item => {
+                const button = document.getElementById('btn-' + item);
+                if (button) {
+                    if (item === tabId) {
+                        button.className = "px-3.5 py-1.5 rounded-md text-slate-800 bg-white shadow-sm font-bold transition-all hover:text-slate-900 cursor-pointer";
+                    } else {
+                        button.className = "px-3.5 py-1.5 rounded-md text-slate-500 hover:text-slate-850 font-medium transition-all cursor-pointer";
+                    }
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Collect server-side model data safely
+            const labels = [];
+            const dRiskData = [];
+            const wBurnoutData = [];
+            const sFailureData = [];
+            const dDelayData = [];
+
+            @if (Model.ProjectedRiskTrend != null && Model.ProjectedRiskTrend.Any())
+            {
+                for (int m = 0; m < Model.ProjectedRiskTrend.Count; m++)
+                {
+                    var pt = Model.ProjectedRiskTrend[m];
+                    <text>
+                    labels.push("@pt.ProjectedDate.ToString("dd MMM") (D+@(m + 1))");
+                    dRiskData.push(@pt.RiskIndex);
+                    wBurnoutData.push(@pt.BurnoutIndex);
+                    sFailureData.push(@pt.SlaIndex);
+                    dDelayData.push(@pt.DelayIndex);
+                    </text>
+                }
+            }
+
+            const ctx = document.getElementById('projectLocationTrendChart');
+            if (ctx && labels.length > 0) {
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Department Risk',
+                                data: dRiskData,
+                                borderColor: '#10b981', // Emerald / Green
+                                backgroundColor: 'rgba(16, 185, 129, 0.08)',
+                                borderWidth: 3.5,
+                                pointBackgroundColor: '#10b981',
+                                pointBorderColor: '#ffffff',
+                                pointHoverRadius: 7,
+                                pointHoverBackgroundColor: '#10b981',
+                                pointHoverBorderColor: '#ffffff',
+                                pointRadius: 4.5,
+                                tension: 0.3,
+                                fill: true
+                            },
+                            {
+                                label: 'Workforce Burnout',
+                                data: wBurnoutData,
+                                borderColor: '#f97316', // Orange
+                                backgroundColor: 'rgba(249, 115, 22, 0.01)',
+                                borderWidth: 2,
+                                pointBackgroundColor: '#f97316',
+                                pointBorderColor: '#ffffff',
+                                pointHoverRadius: 6,
+                                pointHoverBackgroundColor: '#f97316',
+                                pointRadius: 3.5,
+                                tension: 0.3,
+                                fill: false
+                            },
+                            {
+                                label: 'SLA Failure Risk',
+                                data: sFailureData,
+                                borderColor: '#ef4444', // Red
+                                backgroundColor: 'rgba(239, 68, 68, 0.01)',
+                                borderWidth: 2,
+                                pointBackgroundColor: '#ef4444',
+                                pointBorderColor: '#ffffff',
+                                pointHoverRadius: 6,
+                                pointHoverBackgroundColor: '#ef4444',
+                                pointRadius: 3.5,
+                                tension: 0.3,
+                                fill: false
+                            },
+                            {
+                                label: 'Delivery Delay Risk',
+                                data: dDelayData,
+                                borderColor: '#6366f1', // Indigo
+                                backgroundColor: 'rgba(99, 102, 241, 0.01)',
+                                borderWidth: 2,
+                                pointBackgroundColor: '#6366f1',
+                                pointBorderColor: '#ffffff',
+                                pointHoverRadius: 6,
+                                pointHoverBackgroundColor: '#6366f1',
+                                pointRadius: 3.5,
+                                tension: 0.3,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    boxWidth: 12,
+                                    font: {
+                                        size: 11,
+                                        weight: '600',
+                                        family: 'system-ui, -apple-system, sans-serif'
+                                    },
+                                    color: '#475569',
+                                    padding: 15
+                                }
+                            },
+                            tooltip: {
+                                enabled: true,
+                                padding: 12,
+                                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                                titleFont: {
+                                    size: 12,
+                                    weight: '700',
+                                    family: 'system-ui, -apple-system, sans-serif'
+                                },
+                                bodyFont: {
+                                    size: 11,
+                                    family: 'system-ui, -apple-system, sans-serif'
+                                },
+                                bodySpacing: 6,
+                                cornerRadius: 8,
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += context.parsed.y + '%';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                max: 100,
+                                min: 0,
+                                ticks: {
+                                    stepSize: 20,
+                                    callback: function(value) {
+                                        return value + "%";
+                                    },
+                                    font: {
+                                        size: 9,
+                                        family: 'monospace',
+                                        weight: '600'
+                                    },
+                                    color: '#94a3b8'
+                                },
+                                grid: {
+                                    color: '#f1f5f9',
+                                    drawBorder: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Risk Percentage',
+                                    color: '#64748b',
+                                    font: {
+                                        size: 10,
+                                        weight: 'bold'
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: 10,
+                                        weight: '600'
+                                    },
+                                    color: '#64748b'
+                                },
+                                grid: {
+                                    display: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Next 7 Days',
+                                    color: '#64748b',
+                                    font: {
+                                        size: 10,
+                                        weight: 'bold'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

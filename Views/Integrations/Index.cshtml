@@ -1,0 +1,156 @@
+@model IntelliOps.Models.IntegrationsViewModel
+@{
+    ViewData["Title"] = "Relational and ERP Gateways";
+}
+
+<div class="space-y-8 max-w-6xl mx-auto">
+    
+    <!-- SAP ERP Links State -->
+    <div class="bento-card p-6">
+        <h3 class="font-bold text-gray-900 text-sm mb-2">Enterprise SAP ERP Gateway Connectors</h3>
+        <p class="text-xs text-gray-500 mb-6 leading-relaxed">
+            Synchronize direct telemetry packets between local cache variables and the central SAP REST endpoint gateways (SD, MM, PP, FI). 
+            Sync processes refresh buffer values, check connection latency, and verify database states.
+        </p>
+
+        <!-- Dynamic sync notification -->
+        @if (TempData["SyncLogs"] != null)
+        {
+            <div class="mb-6 bg-slate-900 border border-slate-800 rounded-lg p-4 text-slate-350 font-mono text-[10.5px]">
+                <strong class="text-emerald-400 block border-b border-slate-800 pb-1.5 mb-2">[ GATEWAY LOG COMPILING REPORT ]</strong>
+                <pre class="whitespace-pre-wrap select-all text-slate-300">@TempData["SyncLogs"]</pre>
+            </div>
+        }
+
+        <!-- Live status grid of modules -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5 mb-6">
+            @foreach (var connector in Model.SapConnectors)
+            {
+                <div class="bg-slate-50 border border-slate-200/60 rounded-lg p-3.5 flex flex-col justify-between gap-3 shadow-xs">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wide leading-none">@connector.Module</span>
+                            <!-- Status indicators -->
+                            <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border
+                                @(connector.Status == "Connected" ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
+                                  connector.Status == "Error" ? "bg-red-50 text-red-700 border-red-105" :
+                                  "bg-amber-50 text-amber-700 border-amber-105")">
+                                @connector.Status
+                            </span>
+                        </div>
+                        <h4 class="font-bold text-gray-800 text-xs mt-2 leading-tight">@connector.Name</h4>
+                    </div>
+
+                    <div class="text-[10px] text-slate-400 border-t border-slate-200/50 pt-2 flex justify-between select-none">
+                        <span>Latency: @connector.LatencyMs ms</span>
+                        <span>Endpoint: @connector.Endpoint</span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Sync triggers form -->
+        <form action="/Integrations/SyncSap" method="post" class="inline">
+            <button type="submit" class="btn btn-primary text-xs px-3.5 py-2 flex items-center gap-1.5">
+                <i class="lucide-refresh-cw text-[10px] animate-spin"></i>
+                Synchronize SAP Connectors
+            </button>
+        </form>
+    </div>
+
+    <!-- DB Connections grid list table -->
+    <div class="bento-card overflow-hidden flex flex-col">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-gray-900">Linked Relational Warehouse Caches</h3>
+            <span class="text-[10px] text-slate-400 font-semibold">Configured Databanks: @Model.Databases.Count caches</span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-gray-700">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-200">
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider">Storage ID</th>
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider">Engine Connection</th>
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider">Sector Department</th>
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider">Caching State</th>
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider">Last Heartbeat check</th>
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider text-right">Synchronization</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @foreach (var db in Model.Databases)
+                    {
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="px-6 py-4 font-mono text-cyan-600 font-bold">@db.EngineId</td>
+                            <td class="px-6 py-4">
+                                <h5 class="font-bold text-gray-900 text-xs">@db.ConnectionName</h5>
+                                <span class="text-[9.5px] text-slate-400 font-medium block mt-0.5 select-all">@db.HostString</span>
+                            </td>
+                            <td class="px-6 py-4 font-semibold text-gray-650">@db.TargetDepartment</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border
+                                    @(db.SyncState == "Identical" ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
+                                      db.SyncState == "Synchronizing" ? "bg-cyan-50 text-cyan-705 border-cyan-150" :
+                                      "bg-amber-50 text-amber-705 border-amber-105")">
+                                    @db.SyncState
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-400 font-mono text-[10.5px]">@db.LastHealthCheck.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td class="px-6 py-4 text-right">
+                                <form action="/Integrations/SyncDb" method="post" class="inline">
+                                    <input type="hidden" name="id" value="@db.Id" />
+                                    <button type="submit" class="btn btn-secondary text-[11px] px-3 py-1.5">
+                                        Trigger Sync
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Form component to add new Database Cache links -->
+    <div class="bento-card p-6">
+        <h4 class="font-bold text-gray-900 text-sm mb-3">Link New Relational DB Telemetry Source</h4>
+        <form action="/Integrations/AddDatabase" method="post" class="space-y-4 text-xs font-semibold text-gray-750 max-w-3xl">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block mb-1 text-gray-600 font-semibold">Databank Identifier Name *</label>
+                    <input type="text" name="ConnectionName" required placeholder="Warehouse Core Replica" 
+                        class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500" />
+                </div>
+                <div>
+                    <label class="block mb-1 text-gray-600 font-semibold">Destination Department *</label>
+                    <select name="TargetDepartment" class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500">
+                        <option value="Supply Chain">Supply Chain Sector</option>
+                        <option value="Engineering">Engineering Department</option>
+                        <option value="Quality Assurance">Quality Assurance Lab</option>
+                        <option value="Customer Support">Global Support</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block mb-1 text-gray-600 font-semibold">Connection ConnectionString String *</label>
+                    <input type="text" name="HostString" required placeholder="Server=tcp:sql-replica.database.windows.net,1433;Database=IngestionCache;..." 
+                        class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500" />
+                </div>
+                <div>
+                    <label class="block mb-1 text-gray-650 font-semibold">Linked Host Engine *</label>
+                    <select name="EngineId" class="w-full rounded border border-gray-200 px-3 py-2 bg-white text-gray-800 focus:outline-none focus:border-cyan-500">
+                        <option value="MSSQL">Microsoft SQL Server (MSSQL)</option>
+                        <option value="POSTGRES">PostgreSQL (POSTGRES)</option>
+                        <option value="MYSQL">Oracle MySQL Community (MYSQL)</option>
+                        <option value="ORACLE">Oracle RDBMS Enterprise (ORACLE)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary text-xs px-4 py-2">
+                Provision Database Link
+            </button>
+        </form>
+    </div>
+</div>

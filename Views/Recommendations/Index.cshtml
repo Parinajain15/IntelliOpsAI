@@ -1,0 +1,131 @@
+@using System.Reflection
+@model IEnumerable<IntelliOps.Models.Recommendation>
+@{
+    ViewData["Title"] = "Autonomous Optimizer Queue";
+}
+
+@functions {
+    public string GetPropValue(object obj, string[] propNames, string fallback = "")
+    {
+        if (obj == null) return fallback;
+        var type = obj.GetType();
+        foreach (var name in propNames)
+        {
+            var prop = type.GetProperty(name);
+            if (prop != null)
+            {
+                var val = prop.GetValue(obj);
+                if (val != null && !string.IsNullOrWhiteSpace(val.ToString())) return val.ToString();
+            }
+        }
+        return fallback;
+    }
+}
+
+<div class="space-y-8">
+    
+    <!-- Header panel description -->
+    <div class="bento-card p-6">
+        <h3 class="font-bold text-gray-900 text-sm">Autonomous Operational Mitigations Queue</h3>
+        <p class="text-xs text-gray-500 mt-1 leading-relaxed max-w-4xl">
+            Review recommendations computed by IntelliOps optimizer routines based on workload imbalances, queue breaches, and active department logs. 
+            Mitigation execution shifts staff capacity, updates SAP states, and resolves active SLA alerts inside the database.
+        </p>
+    </div>
+
+    <!-- Recommendations bento-grid logs -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var rec in Model)
+            {
+                var id = GetPropValue(rec, new[] { "Id" }, "");
+                var title = GetPropValue(rec, new[] { "Title", "MitigationPlan", "Name" }, "Operational Recommendation");
+                var severity = GetPropValue(rec, new[] { "Severity", "Impact", "Priority" }, "High");
+                var department = GetPropValue(rec, new[] { "Department", "DepartmentName" }, "Operations");
+                var action = GetPropValue(rec, new[] { "ActionablePlan", "Action", "RecommendedAction", "Description" }, "No remediation steps available.");
+                var reason = GetPropValue(rec, new[] { "MetricReference", "Reason", "RootCause", "TriggerReason" }, "Calculated dynamic risk signal.");
+                var status = GetPropValue(rec, new[] { "Status" }, "Open");
+
+                <div class="bento-card p-6 flex flex-col justify-between">
+                    
+                    <div>
+                        <!-- Header banner -->
+                        <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border
+                                @(severity == "Critical" || severity == "High" ? "bg-red-50 text-red-700 border-red-100" :
+                                  severity == "Medium" || severity == "Moderate" ? "bg-amber-50 text-amber-800 border-amber-200" :
+                                  "bg-emerald-50 text-emerald-700 border-emerald-100")">
+                                @severity Impact
+                            </span>
+                            <span class="text-[10px] bg-slate-55 text-slate-500 font-bold uppercase border border-slate-200 px-2.5 py-0.5 rounded">
+                                Queue: @department
+                            </span>
+                        </div>
+
+                        <!-- Recommendations details -->
+                        <h4 class="font-bold text-gray-950 text-xs mb-1">@title</h4>
+                        <span class="text-[10px] text-gray-400 block mb-4 font-mono">Calculated trigger issue: @reason</span>
+
+                        <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                            @action
+                        </p>
+
+                        @{
+                            var recOwner = GetPropValue(rec, new[] { "Owner" }, "Operations Team");
+                            var recImpact = GetPropValue(rec, new[] { "ExpectedImpactPercent" }, "0");
+                            var recRiskSource = GetPropValue(rec, new[] { "RiskSource" }, "Queue Congestion");
+                            var recCat = GetPropValue(rec, new[] { "Category" }, "Stabilize department workload");
+                        }
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px] bg-slate-50 p-2.5 rounded border border-gray-150 font-mono mb-4">
+                            <div><span class="text-gray-400">Owner:</span> <span class="font-semibold text-gray-700">@recOwner</span></div>
+                            <div><span class="text-gray-400">Impact Efficiency:</span> <span class="font-semibold text-emerald-600">+@recImpact%</span></div>
+                            <div class="col-span-1 sm:col-span-2"><span class="text-gray-400">Risk Origin:</span> <span class="font-semibold text-red-600">@recRiskSource</span></div>
+                            <div class="col-span-1 sm:col-span-2"><span class="text-gray-400">Category:</span> <span class="font-semibold text-indigo-600">@recCat</span></div>
+                        </div>
+                    </div>
+
+                    <!-- Actions button to execute mitigation plan -->
+                    <div class="border-t border-gray-100 pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4">
+                        <div class="text-[11px] font-medium text-slate-500 flex items-center gap-2">
+                            <span>Status State:</span> 
+                            <span class="font-bold uppercase tracking-tight px-2.5 py-0.5 rounded border text-[10px] shadow-sm
+                                @(status == "Completed" ? "bg-emerald-50 text-emerald-800 border-emerald-205 font-extrabold" :
+                                  status == "In Progress" ? "bg-blue-50 text-blue-800 border-blue-200" :
+                                  "bg-yellow-50 text-yellow-800 border-yellow-200")">
+                                @status
+                            </span>
+                        </div>
+
+                        <form action="/Recommendations/UpdateStatus" method="post" class="flex items-center gap-2">
+                            <input type="hidden" name="id" value="@id" />
+                            <select name="status" class="bg-white border border-gray-250 text-xs px-2.5 py-1.5 rounded focus:outline-none focus:border-indigo-500 font-medium">
+                                @foreach (var opt in new[] { "Pending", "In Progress", "Completed" })
+                                {
+                                    if (status == opt)
+                                    {
+                                        <option value="@opt" selected="selected">@opt</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@opt">@opt</option>
+                                    }
+                                }
+                            </select>
+                            <button type="submit" class="btn btn-primary text-xs px-3.5 py-1.5 font-bold hover:shadow-md transition-all">
+                                Update Status
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            }
+        }
+        else
+        {
+            <div class="bento-card p-12 text-center text-slate-400 text-xs col-span-2">
+                No active optimization recommendations inside data streams currently.
+            </div>
+        }
+    </div>
+</div>

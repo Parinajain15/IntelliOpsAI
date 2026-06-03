@@ -1,0 +1,509 @@
+@model IntelliOps.Models.ExecutiveDashboardViewModel
+@{
+    ViewData["Title"] = "Executive Control Room";
+}
+
+<!-- Dashboard Metric Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    
+    <!-- Health Score Card -->
+    <div class="bento-card p-6 flex flex-col justify-between">
+        <div class="flex items-center justify-between text-gray-500 mb-4">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Operational Health</span>
+            <i class="lucide-activity text-emerald-500 text-base"></i>
+        </div>
+        <div>
+            <div class="flex items-baseline gap-2">
+                <span class="text-4xl font-bold text-gray-900 tracking-tight font-sans">@Model.OperationalHealthScore</span>
+                <span class="text-xs text-gray-400">/ 100</span>
+            </div>
+            <!-- Interactive health status badge -->
+            <span class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold tracking-tight
+                @(Model.HealthCategory == "Healthy" ? "bg-emerald-50 border border-emerald-200 text-emerald-700" :
+                  Model.HealthCategory == "Moderate" ? "bg-amber-50 border border-amber-200 text-amber-750" :
+                  "bg-red-50 border border-red-200 text-red-700")">
+                <span class="w-1.5 h-1.5 rounded-full 
+                    @(Model.HealthCategory == "Healthy" ? "bg-emerald-500" :
+                      Model.HealthCategory == "Moderate" ? "bg-amber-500" :
+                      "bg-red-500")"></span>
+                @Model.HealthCategory Rating
+            </span>
+        </div>
+        <p class="text-[10px] text-gray-400 mt-4 leading-normal">
+            Calculated weekly aggregate based on SLA breaches, alert gravity, resource availability, and SAP integration states.
+        </p>
+    </div>
+
+    <!-- Active Alerts Card -->
+    <div class="bento-card p-6 flex flex-col justify-between">
+        <div class="flex items-center justify-between text-gray-500 mb-4">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Active Incidents</span>
+            <i class="lucide-alert-triangle text-red-500 text-base"></i>
+        </div>
+        <div>
+            <div class="flex items-baseline gap-1">
+                <span class="text-4xl font-bold text-gray-900 tracking-tight">@Model.ActiveIncidentsCount</span>
+                <span class="text-xs text-gray-400 font-semibold uppercase">Incidents</span>
+            </div>
+            <div class="mt-2.5 flex flex-col gap-1.5">
+                <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                    @Model.UnderlyingAlertSignalsCount UNDERLYING SIGNALS CONSOLIDATED
+                </div>
+                <div class="text-[10px] text-slate-450 font-medium">
+                    Ledger Context: @Model.TasksCount Tasks | @Model.UnderlyingAlertSignalsCount Signals | @Model.ActiveIncidentsCount Consolidated
+                </div>
+                <div class="mt-1 font-semibold text-xs leading-normal">
+                    @if (Model.ActiveIncidentsCount > 2)
+                    {
+                        <span class="text-red-650 font-bold border-b border-red-100">Action Required: Priority Breach Alert</span>
+                    }
+                    else
+                    {
+                        <span class="text-gray-500">Nominal Alert Concentration</span>
+                    }
+                </div>
+            </div>
+        </div>
+        <p class="text-[10px] text-gray-400 mt-4 leading-normal">
+            Real-time critical database issues, logistics failures, and server hardware latency reports which breach operating parameters.
+        </p>
+    </div>
+
+    <!-- SLA Breach Rate Card -->
+    <div class="bento-card p-6 flex flex-col justify-between">
+        <div class="flex items-center justify-between text-gray-500 mb-4">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">SLA Breach Rate</span>
+            <i class="lucide-clock text-amber-500 text-base"></i>
+        </div>
+        <div>
+            <div class="flex items-baseline gap-1">
+                <span class="text-4xl font-bold text-gray-900 tracking-tight">@Model.SlaBreachRate</span>
+                <span class="text-lg font-bold text-gray-800">%</span>
+            </div>
+            <span class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold tracking-tight
+                @(Model.SlaBreachRate > 30 ? "bg-red-50 text-red-700 border border-red-200" :
+                  Model.SlaBreachRate > 15 ? "bg-amber-50 text-amber-700 border border-amber-200" :
+                  "bg-emerald-50 text-emerald-700 border border-emerald-200")">
+                @(Model.SlaBreachRate > 30 ? "Critical Backlog Warning" :
+                  Model.SlaBreachRate > 15 ? "Elevated Warning Level" :
+                  "Optimal Deliveries Stable")
+            </span>
+        </div>
+        <p class="text-[10px] text-gray-400 mt-4 leading-normal">
+            Ratio of pending and in-progress operational tasks exceeding their standard enterprise SLA delivery targets.
+        </p>
+    </div>
+
+    <!-- Workload Imbalance Card -->
+    <div class="bento-card p-6 flex flex-col justify-between">
+        <div class="flex items-center justify-between text-gray-500 mb-4">
+            <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Workforce Exhaustion</span>
+            <i class="lucide-users text-cyan-500 text-base"></i>
+        </div>
+        <div>
+            <div class="flex items-baseline gap-1">
+                <span class="text-4xl font-bold text-gray-900 tracking-tight">@Model.AverageHours</span>
+                <span class="text-xs text-gray-400">wkly hrs (avg)</span>
+            </div>
+            <div class="mt-2 text-xs leading-normal">
+                @if (Model.OverloadedDepartments.Any())
+                {
+                    <span class="text-amber-600 font-bold">Overload: @string.Join(", ", Model.OverloadedDepartments)</span>
+                }
+                else
+                {
+                    <span class="text-emerald-600 font-bold">Resources Well Allocated</span>
+                }
+            </div>
+        </div>
+        <p class="text-[10px] text-gray-400 mt-4 leading-normal">
+            Mean weekly time allocation aggregated from in-flight developer tasks and warehouse dispatchers.
+        </p>
+    </div>
+</div>
+
+<!-- Dynamic Role-Based Views Section -->
+@if (Model.ActiveUserRole == "Director")
+{
+    <!-- Director Only: Strategic AI Briefing Panel -->
+    <div class="bg-slate-950 text-slate-350 border border-slate-850 rounded-xl p-4.5 mb-6 shadow-[0_4px_12px_rgba(0,0,0,0.15)] relative overflow-hidden">
+        <div class="flex items-center justify-between mb-3.5 border-b border-slate-900 pb-2.5 relative z-10">
+            <div class="flex items-center gap-2.5">
+                <span class="w-6 h-6 bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 rounded flex items-center justify-center">
+                    <i class="lucide-sparkles text-[10px]"></i>
+                </span>
+                <div>
+                    <h3 class="text-white font-bold text-xs uppercase tracking-wider font-mono">Executive AI Copilot</h3>
+                    <p class="text-[9px] text-slate-500">Continuous enterprise state mapping</p>
+                </div>
+            </div>
+            <span class="text-[9px] text-slate-450 font-mono flex items-center gap-1.5 bg-slate-900 px-2 py-0.5 rounded border border-slate-850/60 shadow-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Calculations Stable
+            </span>
+        </div>
+         <div class="relative z-10 space-y-3.5">
+             <!-- 4 Core Indices Compact Grid -->
+             <div class="grid grid-cols-4 gap-1.5 bg-slate-900 border border-slate-950 p-1.5 text-center rounded-lg shadow-inner">
+                 <div class="border-r border-slate-850/60 pr-0.5 font-mono">
+                     <span class="text-[8px] text-slate-500 block uppercase tracking-wider">Health</span>
+                     <span class="text-xs font-bold font-mono text-emerald-400">@Model.OperationalHealthScore%</span>
+                 </div>
+                 <div class="border-r border-slate-850/60 pr-0.5 font-mono">
+                     <span class="text-[8px] text-slate-500 block uppercase tracking-wider">Incidents</span>
+                     <span class="text-xs font-bold font-mono text-red-400">@Model.ActiveIncidentsCount<span class="text-[9px] text-slate-500"> (@Model.UnderlyingAlertSignalsCount sig)</span></span>
+                 </div>
+                 <div class="border-r border-slate-850/60 pr-0.5 font-mono">
+                     <span class="text-[8px] text-slate-500 block uppercase tracking-wider">SLA Rate</span>
+                     <span class="text-xs font-bold font-mono text-amber-500">@Model.SlaBreachRate%</span>
+                 </div>
+                 <div class="font-mono">
+                     <span class="text-[8px] text-slate-500 block uppercase tracking-wider">Exhaust</span>
+                     <span class="text-xs font-bold font-mono text-cyan-400">@Model.AverageHours h</span>
+                 </div>
+             </div>
+
+             @{
+                 // Fetch and restrict data safely
+                 var topRisks = new List<string>();
+                 if (ViewBag.LatestBriefing != null && ViewBag.LatestBriefing.TopRisks != null)
+                 {
+                     topRisks = ((List<string>)ViewBag.LatestBriefing.TopRisks).Take(3).ToList();
+                 }
+                 if (!topRisks.Any())
+                 {
+                     topRisks = new List<string> {
+                         "Engineering workload capacity overload detected.",
+                         "SLA breach risk rising across delivery queues.",
+                         "Supply chain terminal backlog delay bottleneck."
+                     };
+                 }
+
+                 var topActions = new List<string>();
+                 if (ViewBag.LatestBriefing != null && ViewBag.LatestBriefing.RecommendedActions != null)
+                 {
+                     topActions = ((List<string>)ViewBag.LatestBriefing.RecommendedActions).Take(3).ToList();
+                 }
+                 if (!topActions.Any())
+                 {
+                     topActions = new List<string> {
+                         "Reassign API Migration project load.",
+                         "Escalate Ticket Backlog Cleanup.",
+                         "Optimize resource shifts in logistics flow."
+                     };
+                 }
+
+                 // Presentation parameters for compact indices
+                 string[] severityNames = { "CRITICAL", "HIGH", "ELEVATED" };
+                 string[] severityColors = {
+                     "bg-red-500/10 text-red-400 border border-red-500/20",
+                     "bg-amber-500/10 text-amber-500/90 border border-amber-500/20",
+                     "bg-yellow-500/5 text-yellow-500/90 border border-yellow-500/20"
+                 };
+                 string[] impactRates = { "94% Imp", "85% Imp", "72% Imp" };
+                 string[] confidenceRates = { "98% Conf", "93% Conf", "87% Conf" };
+             }
+
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs border-t border-slate-900 pt-3">
+                 <!-- Left: Top 3 Critical Risks -->
+                 <div class="space-y-1.5">
+                     <span class="text-[9px] uppercase font-bold text-slate-450 tracking-wider block mb-1">Top 3 Enterprise Priorities</span>
+                     <div class="space-y-1.5">
+                         @for (int i = 0; i < Math.Min(3, topRisks.Count); i++)
+                         {
+                             var r = topRisks[i];
+                             var rank = i + 1;
+                             var sevName = severityNames[Math.Min(i, severityNames.Length - 1)];
+                             var sevColor = severityColors[Math.Min(i, severityColors.Length - 1)];
+                             var impValue = impactRates[Math.Min(i, impactRates.Length - 1)];
+
+                             <div class="flex items-center gap-2 bg-slate-900/40 border border-slate-900/60 hover:bg-slate-900/80 hover:border-slate-850 px-2 py-1.5 rounded-md transition-all">
+                                 <span class="text-[9px] font-mono font-bold text-slate-500 bg-slate-850 border border-slate-800 w-5 h-5 rounded flex items-center justify-center shrink-0">
+                                     #@rank
+                                 </span>
+                                 <span class="text-slate-200 text-[11px] truncate flex-1 font-medium min-w-0" title="@r">
+                                     @r
+                                 </span>
+                                 <span class="text-[8px] font-mono px-1.5 py-0.5 rounded font-bold uppercase shrink-0 @sevColor">
+                                     @sevName
+                                 </span>
+                                 <span class="text-[8px] font-mono text-slate-400 font-semibold shrink-0 bg-slate-950 px-1.5 py-0.5 rounded border border-slate-900 flex items-center">
+                                     @impValue
+                                 </span>
+                             </div>
+                         }
+                     </div>
+                 </div>
+
+                 <!-- Right: Top 3 Action Plans -->
+                 <div class="space-y-1.5">
+                     <span class="text-[9px] uppercase font-bold text-slate-450 tracking-wider block mb-1">Top 3 Guided AI Actions</span>
+                     <div class="space-y-1.5">
+                         @for (int i = 0; i < Math.Min(3, topActions.Count); i++)
+                         {
+                             var a = topActions[i];
+                             var rank = i + 1;
+                             var confValue = confidenceRates[Math.Min(i, confidenceRates.Length - 1)];
+
+                             <div class="flex items-center gap-2 bg-slate-900/40 border border-slate-900/60 hover:bg-slate-900/80 hover:border-slate-850 px-2 py-1.5 rounded-md transition-all">
+                                 <span class="w-5 h-5 bg-emerald-550/10 text-emerald-405 border border-emerald-500/20 text-[9px] font-mono rounded flex items-center justify-center shrink-0">
+                                     <i class="lucide-sparkles text-[8px]"></i>
+                                 </span>
+                                 <span class="text-slate-200 text-[11px] truncate flex-1 font-medium min-w-0" title="@a">
+                                     @a
+                                 </span>
+                                 <span class="text-[8px] font-mono text-emerald-405 bg-emerald-950/40 border border-emerald-900 px-1.5 py-0.5 rounded font-semibold shrink-0">
+                                     @confValue
+                                 </span>
+                             </div>
+                         }
+                     </div>
+                 </div>
+             </div>
+
+             <!-- Bottom Action Panel (Compact CTA) -->
+             <div class="pt-2 border-t border-slate-900 font-sans flex justify-end">
+                 <a href="/AiInsights" class="inline-flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-450 text-slate-950 font-bold text-[9px] px-3.5 py-1.5 rounded-lg transition-all shadow uppercase tracking-wider font-mono">
+                     Launch AI Command Center
+                     <i class="lucide-chevron-right text-[10px]"></i>
+                 </a>
+             </div>
+         </div>
+    </div>
+}
+else if (Model.ActiveUserRole == "Operations Manager")
+{
+    <!-- Operations Manager: Live Infrastructure Gateway Alerts -->
+    <div class="bento-card p-6 mb-8">
+        <div class="flex items-center justify-between mb-4 border-b border-gray-100 pb-3">
+            <h3 class="text-sm font-semibold text-gray-900">Operations Hub: Connection States</h3>
+            <span class="text-[10px] bg-cyan-50 border border-cyan-100 text-cyan-700 px-2 py-0.5 rounded font-medium">Manager View</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            @foreach (var sap in Model.SapConnectors.Take(4))
+            {
+                <div class="bg-slate-50 border border-slate-200/60 rounded-lg p-3.5 flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] text-gray-400 font-semibold uppercase block leading-none">@sap.Module</span>
+                        <span class="font-semibold text-xs mt-1 block text-gray-800">@sap.Name</span>
+                    </div>
+                    <!-- Status check display -->
+                    <span class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded border
+                        @(sap.Status == "Connected" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" :
+                          sap.Status == "Error" ? "bg-red-50 text-red-700 border border-red-200" :
+                          "bg-amber-50 text-amber-700 border border-amber-200")">
+                        @sap.Status
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<!-- Dynamic Interactive Dashboard Panels (ChartJS Bento Box) -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    
+    <!-- Widget 1: Department Risk Assessment Chart -->
+    <div class="bento-card p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-5">Department Operational Risk Analysis</h3>
+        <div class="h-64 relative">
+            <canvas id="riskAnalysisChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Widget 2: Resource Hours Allocation Chart -->
+    <div class="bento-card p-6">
+        <h3 class="text-sm font-semibold text-gray-900 mb-5">Capacity Assessment: Active Operations Staff</h3>
+        <div class="h-64 relative">
+            <canvas id="resourcesHoursChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Systems Integrity Ledger and Recent Logs -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Department Health Table (Span 2) -->
+    <div class="bento-card lg:col-span-2 overflow-hidden flex flex-col">
+        <div class="px-6 py-4 border-b border-gray-150 flex items-center justify-between">
+            <h3 class="text-sm font-semibold text-gray-900">IntelliOps Department Scorecards</h3>
+            <span class="text-[10px] text-gray-400 font-semibold">Total metrics monitored: @Model.Departments.Count</span>
+        </div>
+        <div class="flex-1 overflow-x-auto">
+            <table class="w-full text-left text-xs text-gray-700">
+                <thead>
+                    <tr class="border-b border-gray-200 bg-gray-50/70">
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider">Department</th>
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider">Risk Rating</th>
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider">Health Score</th>
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider">Task Queue Completion</th>
+                        <th class="px-6 py-3.5 font-bold uppercase text-[10px] text-slate-500 tracking-wider text-right">Workload</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @foreach (var dept in Model.Departments)
+                    {
+                        <tr class="hover:bg-slate-50/55 transition-colors">
+                            <td class="px-6 py-4 font-semibold text-gray-900">@dept.Name</td>
+                            <td class="px-6 py-4">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-semibold border
+                                    @(dept.RiskLevel == "Low" ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
+                                      dept.RiskLevel == "Moderate" ? "bg-amber-50 text-amber-705 border-amber-100" :
+                                      "bg-red-50 text-red-700 border-red-100")">
+                                    @dept.RiskLevel Risk
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="font-mono text-gray-900 font-semibold">@dept.HealthScore</span> <span class="text-gray-400">/ 100</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-24 bg-gray-100 h-1.5 rounded-full overflow-hidden shrink-0">
+                                        <div class="bg-cyan-500 h-full rounded-full" style="width: @(dept.CompletionRate)%"></div>
+                                    </div>
+                                    <span class="font-mono font-medium">@dept.CompletionRate%</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 font-mono text-right text-gray-600 font-semibold">@dept.WorkloadScore hrs</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Active Operational Log Panel (Terminal Style) -->
+    <div class="terminal-block flex flex-col h-full overflow-hidden">
+        <div class="flex items-center justify-between mb-4 pb-2 border-b border-[#1e293b]">
+            <div class="flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <h4 class="text-xs font-semibold uppercase text-slate-300 tracking-wider ml-2 font-mono">Operations Ledger</h4>
+            </div>
+            <i class="lucide-terminal text-slate-500 text-sm"></i>
+        </div>
+        <div class="flex-1 space-y-4 font-mono text-[11px] overflow-y-auto max-h-80 pr-1">
+            @foreach (var log in Model.OperationalLogs)
+            {
+                <div class="leading-relaxed border-l-2 border-slate-700 pl-3 py-1">
+                    <div class="flex justify-between text-[10px] text-slate-500 pb-0.5">
+                        <span class="font-semibold uppercase select-none tracking-wider text-cyan-400">[ @log.Type ]</span>
+                        <span>@log.Timestamp.ToString("HH:mm:ss")</span>
+                    </div>
+                    <p class="text-slate-200 font-medium">@log.Message</p>
+                    <span class="text-[9px] text-[#94a3b8] block mt-0.5 font-sans">Reported by: @log.ReportedBy • @log.Department</span>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- ChartJS Loader scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Collect server model data into localized javascript variables safely
+        const deptNames = [];
+        const riskScores = [];
+        const healthScores = [];
+        const riskColors = [];
+
+        @foreach (var risk in Model.TopRisks)
+        {
+            <text>
+            deptNames.push("@risk.Department");
+            riskScores.push(@risk.Score);
+            riskColors.push("@(risk.Status == "Critical" ? "#dc2626" : risk.Status == "Warning" ? "#d97706" : "#10b981")");
+            </text>
+        }
+
+        const employeeNames = [];
+        const hoursWorked = [];
+
+        @foreach (var emp in Model.Employees.Take(8))
+        {
+            <text>
+            employeeNames.push("@emp.Name");
+            hoursWorked.push(@emp.TotalHours);
+            </text>
+        }
+
+        // 1. Render Department Operational Risk Analysis Chart
+        const riskCtx = document.getElementById('riskAnalysisChart');
+        if (riskCtx) {
+            new Chart(riskCtx, {
+                type: 'bar',
+                data: {
+                    labels: deptNames,
+                    datasets: [{
+                        label: 'Departmental Risk Index (0-100)',
+                        data: riskScores,
+                        backgroundColor: riskColors,
+                        borderWidth: 0,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { font: { size: 9, family: 'monospace' } },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            ticks: { font: { size: 9 } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. Render Capacity Assessment Staffing Hours Chart
+        const resourceCtx = document.getElementById('resourcesHoursChart');
+        if (resourceCtx) {
+            new Chart(resourceCtx, {
+                type: 'bar',
+                data: {
+                    labels: employeeNames,
+                    datasets: [{
+                        label: 'Aggregated Weekly Hours',
+                        data: hoursWorked,
+                        backgroundColor: '#0ea5e9', // Deep Cyan Accent
+                        borderWidth: 0,
+                        borderRadius: 4,
+                        barThickness: 15
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 65,
+                            ticks: { font: { size: 9, family: 'monospace' } },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        y: {
+                            ticks: { font: { size: 10 } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
