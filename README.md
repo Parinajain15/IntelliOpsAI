@@ -106,6 +106,11 @@ Executive AI Briefing Hub
 
 <img src="screenshots/dashboard.png" width="100%">
 
+<img src="screenshots/dash 2.png" width="100%">
+
+---
+
+
 ### Executive Briefing Hub
 
 <img src="screenshots/executive-briefing.png.png" width="100%">
